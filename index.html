@@ -1,0 +1,4034 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RobbGameSite1212</title>
+    <style>
+        /* ===== CSS Variables & Reset ===== */
+        :root {
+            /* Default Theme Colors */
+            --bg: radial-gradient(circle at top left, #1e293b, #0f172a 70%);
+            --bg-soft: #0f172a;
+            --bg-card: linear-gradient(145deg, #1e293b, #334155);
+            --bg-card-soft: #1e293b;
+            --accent: #38bdf8;
+            --accent-soft: rgba(56, 189, 248, 0.45);
+            --accent-2: #22c55e;
+            --text-main: #e0f2fe;
+            --text-muted: #94a3b8;
+            --border-subtle: rgba(148, 163, 184, 0.3);
+            --pattern-line: rgba(56, 189, 248, 0.2);
+            
+            /* Layout */
+            --sidebar-width: 240px;
+            --border-radius-lg: 16px;
+            --border-radius-md: 12px;
+            --border-radius-sm: 8px;
+            --spacing-unit: 8px;
+            --header-height: 60px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: var(--bg);
+            background-attachment: fixed; /* Makes gradient scroll with content */
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+            transition: background 0.5s ease; /* Smooth transition for bg changes */
+        }
+
+        /* ===== Background Elements ===== */
+        .bg-gradient, .bg-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .bg-gradient {
+            background: inherit; /* Inherits from body */
+        }
+
+        .bg-pattern {
+            opacity: 0.15;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        /* ===== App Layout ===== */
+        .app {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ===== Sidebar ===== */
+        .side-nav {
+            width: var(--sidebar-width);
+            background: rgba(15, 23, 42, 0.85); /* Slightly transparent */
+            backdrop-filter: blur(10px);
+            padding: calc(var(--spacing-unit) * 2);
+            display: flex;
+            flex-direction: column;
+            gap: calc(var(--spacing-unit) * 1.5);
+            border-right: 1px solid var(--border-subtle);
+        }
+
+        .side-nav-header {
+            display: flex;
+            align-items: center;
+            gap: calc(var(--spacing-unit) * 1);
+            margin-bottom: calc(var(--spacing-unit) * 2);
+        }
+
+        .side-logo-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .side-logo-text {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: 0.03em;
+        }
+
+        .side-section-label {
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin-top: calc(var(--spacing-unit) * 2);
+        }
+
+        .side-nav-list {
+            display: flex;
+            flex-direction: column;
+            gap: calc(var(--spacing-unit) * 0.5);
+        }
+
+        .side-nav-item {
+            background: var(--bg-card-soft);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--border-radius-md);
+            padding: calc(var(--spacing-unit) * 1.25) calc(var(--spacing-unit) * 1.5);
+            color: var(--text-main);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: calc(var(--spacing-unit) * 1);
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .side-nav-item:hover {
+            background: var(--bg-card);
+            border-color: var(--accent-soft);
+        }
+
+        .side-nav-item.active {
+            background: var(--accent-soft);
+            border-color: var(--accent);
+            color: #fff;
+        }
+
+        .side-nav-item .icon {
+            font-size: 1.2rem;
+        }
+
+        /* ===== Main Content Area ===== */
+        .main-content {
+            flex: 1;
+            padding: calc(var(--spacing-unit) * 2);
+            overflow-y: auto;
+        }
+
+        /* ===== Tab Panels ===== */
+        .tab-panel {
+            display: none;
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== Welcome Block ===== */
+        .welcome-block {
+            margin-bottom: calc(var(--spacing-unit) * 3);
+            max-width: 600px;
+        }
+
+        .welcome-title {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: 0.02em;
+            margin-bottom: calc(var(--spacing-unit) * 0.5);
+        }
+
+        .welcome-sub {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* ===== Search Area ===== */
+        .search-area {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin-bottom: calc(var(--spacing-unit) * 2);
+        }
+
+        .search-input {
+            width: 100%;
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--border-radius-md);
+            outline: none;
+            background: rgba(15, 23, 42, 0.6); /* Semi-transparent */
+            backdrop-filter: blur(8px);
+            color: var(--text-main);
+            padding: 12px 44px 12px 16px;
+            font-size: 14px;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .search-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+        }
+
+        .search-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 16px;
+            color: var(--text-muted);
+        }
+
+        /* ===== Game List Grid ===== */
+        .game-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: calc(var(--spacing-unit) * 2.5);
+            margin-top: calc(var(--spacing-unit) * 1.5);
+        }
+
+        /* ===== Game Card ===== */
+        .game-card {
+            position: relative;
+            background: var(--bg-card);
+            background-size: 200% 200%; /* For gradient animation */
+            border-radius: var(--border-radius-lg);
+            padding: calc(var(--spacing-unit) * 1.5);
+            display: flex;
+            flex-direction: column;
+            gap: calc(var(--spacing-unit) * 1);
+            align-items: stretch;
+            justify-content: space-between;
+            min-height: 180px; /* Consistent height */
+            aspect-ratio: auto;
+            overflow: hidden;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+            border: 1px solid var(--border-subtle);
+            cursor: pointer;
+        }
+
+        .game-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            padding: 1px;
+            background: linear-gradient(45deg, var(--accent), var(--accent-2), var(--accent), var(--accent-2));
+            background-size: 300% 300%;
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: exclude;
+            -webkit-mask-composite: xor; /* For older browsers */
+            animation: borderSpin 8s linear infinite;
+            opacity: 0.3;
+            z-index: 1;
+        }
+
+        .game-card::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: inherit;
+            background-size: 200% 200%;
+            border-radius: inherit;
+            opacity: 0;
+            z-index: -1;
+            transition: opacity 0.3s ease;
+            animation: cardGlow 18s ease infinite;
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px) scale(1.03);
+            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.5);
+            border-color: var(--accent-soft);
+        }
+
+        .game-card:hover::after {
+            opacity: 1;
+        }
+
+        .game-top-row {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: calc(var(--spacing-unit) * 1.25);
+            z-index: 1; /* Above pseudo-elements */
+        }
+
+        .game-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 18px;
+            background: conic-gradient(from 200deg, #f97316, #2563eb, #ec4899, #eab308, #f97316);
+            background-size: cover;
+            background-position: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            flex-shrink: 0; /* Prevent shrinking */
+        }
+
+        .game-body {
+            display: flex;
+            flex-direction: column;
+            gap: calc(var(--spacing-unit) * 0.25);
+            overflow: hidden; /* Prevent text overflow */
+        }
+
+        .game-title {
+            font-size: 15px;
+            font-weight: 600;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .game-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .game-actions {
+            margin-top: auto; /* Pushes button to bottom */
+            z-index: 1; /* Above pseudo-elements */
+        }
+
+        .game-button {
+            width: 100%;
+            border: none;
+            border-radius: var(--border-radius-sm);
+            padding: 8px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            background: var(--accent);
+            color: #020617;
+            transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+        }
+
+        .game-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+            filter: saturate(1.1);
+        }
+
+        /* ===== Animations ===== */
+        @keyframes cardGlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes borderSpin {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
+
+        /* ===== Game Overlay ===== */
+        #game-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.96);
+            backdrop-filter: blur(12px);
+            display: none; /* Hidden by default */
+            align-items: stretch;
+            z-index: 1000; /* Very high z-index */
+        }
+
+        #game-iframe {
+            flex: 1;
+            border: none;
+        }
+
+        /* ===== Settings Panel Specific Styles ===== */
+        .settings-panel {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .settings-group {
+            background: var(--bg-card-soft);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--border-radius-lg);
+            padding: calc(var(--spacing-unit) * 2);
+            margin-bottom: calc(var(--spacing-unit) * 2);
+        }
+
+        .settings-group h3 {
+            font-size: 18px;
+            margin-bottom: calc(var(--spacing-unit) * 1.5);
+            color: var(--accent);
+        }
+
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: calc(var(--spacing-unit) * 2);
+            margin-bottom: calc(var(--spacing-unit) * 1.5);
+        }
+
+        .form-field {
+            flex: 1 1 300px; /* At least 300px wide, grow as needed */
+        }
+
+        .form-field label {
+            display: block;
+            margin-bottom: calc(var(--spacing-unit) * 0.5);
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .form-field select, .form-field input {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: var(--border-radius-sm);
+            border: 1px solid var(--border-subtle);
+            background: var(--bg-card);
+            color: var(--text-main);
+            font-size: 14px;
+        }
+
+        .form-field select:focus, .form-field input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 900px) {
+            .app {
+                flex-direction: column;
+            }
+            .side-nav {
+                width: 100%;
+                padding: calc(var(--spacing-unit) * 1.5);
+            }
+            .side-nav-list {
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+            .side-nav-item {
+                flex: 1;
+                min-width: 120px;
+                justify-content: center;
+            }
+            .main-content {
+                padding: calc(var(--spacing-unit) * 1.5);
+            }
+            .game-list {
+                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+                gap: calc(var(--spacing-unit) * 1.5);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .game-list {
+                grid-template-columns: 1fr;
+            }
+            .side-logo-text {
+                display: none; /* Hide text on very small screens */
+            }
+            .side-nav-header {
+                justify-content: center;
+            }
+        }
+
+        /* ===== Theme Definitions ===== */
+        /* Expanded theme definitions based on original code plus 100+ additions */
+        body[data-theme="default"] { /* This is the initial state */
+            --bg: radial-gradient(circle at top left, #1e293b, #0f172a 70%);
+            --bg-soft: #0f172a;
+            --bg-card: linear-gradient(145deg, #1e293b, #334155);
+            --bg-card-soft: #1e293b;
+            --accent: #38bdf8;
+            --accent-soft: rgba(56, 189, 248, 0.45);
+            --accent-2: #22c55e;
+            --text-main: #e0f2fe;
+            --text-muted: #94a3b8;
+            --border-subtle: rgba(148, 163, 184, 0.3);
+            --pattern-line: rgba(56, 189, 248, 0.2);
+        }
+
+        body[data-theme="candy-pop"] {
+            --bg: radial-gradient(circle at top left, #ec4899, #3b82f6 70%);
+            --bg-soft: #1e293b;
+            --bg-card: linear-gradient(145deg, #ec4899, #3b82f6);
+            --bg-card-soft: #1e293b;
+            --accent: #f472b6;
+            --accent-soft: rgba(244, 114, 182, 0.5);
+            --accent-2: #60a5fa;
+            --text-main: #fef2f8;
+            --text-muted: #f3e8ff;
+            --border-subtle: rgba(236, 72, 153, 0.4);
+            --pattern-line: rgba(244, 114, 182, 0.26);
+        }
+
+        body[data-theme="void"] {
+            --bg: radial-gradient(circle at top left, #000000, #0f172a 70%);
+            --bg-soft: #000000;
+            --bg-card: linear-gradient(145deg, #0f172a, #000000);
+            --bg-card-soft: #000000;
+            --accent: #a8a29e;
+            --accent-soft: rgba(168, 162, 158, 0.3);
+            --accent-2: #9ca3af;
+            --text-main: #f5f5f4;
+            --text-muted: #a8a29e;
+            --border-subtle: rgba(156, 163, 175, 0.2);
+            --pattern-line: rgba(168, 162, 158, 0.15);
+        }
+
+        body[data-theme="pastel-dream"] {
+            --bg: radial-gradient(circle at top left, #a78bfa, #fda4af 70%);
+            --bg-soft: #e0e7ff;
+            --bg-card: linear-gradient(145deg, #c7d2fe, #fbcfe8);
+            --bg-card-soft: #e0e7ff;
+            --accent: #a78bfa;
+            --accent-soft: rgba(167, 139, 250, 0.4);
+            --accent-2: #fda4af;
+            --text-main: #1e293b;
+            --text-muted: #475569;
+            --border-subtle: rgba(167, 139, 250, 0.3);
+            --pattern-line: rgba(253, 164, 175, 0.2);
+        }
+
+        body[data-theme="dusk-horizon"] {
+            --bg: linear-gradient(to bottom, #4f46e5, #7c3aed, #db2777);
+            --bg-soft: #1e1b4b;
+            --bg-card: linear-gradient(145deg, #4f46e5, #7c3aed);
+            --bg-card-soft: #1e1b4b;
+            --accent: #f0abfc;
+            --accent-soft: rgba(240, 171, 252, 0.4);
+            --accent-2: #c7d2fe;
+            --text-main: #ede9fe;
+            --text-muted: #c4b5fd;
+            --border-subtle: rgba(240, 171, 252, 0.3);
+            --pattern-line: rgba(199, 210, 254, 0.25);
+        }
+
+        body[data-theme="arcade-glow"] {
+            --bg: radial-gradient(circle at top left, #166534, #134e4a 70%);
+            --bg-soft: #022c22;
+            --bg-card: linear-gradient(145deg, #22c55e, #14b8a6);
+            --bg-card-soft: #022c22;
+            --accent: #a3e635;
+            --accent-soft: rgba(163, 230, 53, 0.45);
+            --accent-2: #38bdf8;
+            --text-main: #dcfce7;
+            --text-muted: #a7f3d0;
+            --border-subtle: rgba(163, 230, 53, 0.4);
+            --pattern-line: rgba(56, 189, 248, 0.26);
+        }
+
+        body[data-theme="solar-flare"] {
+            --bg: radial-gradient(circle at top left, #1f2937, #020617 70%);
+            --bg-soft: #020617;
+            --bg-card: linear-gradient(145deg, #7c2d12, #9a3412);
+            --bg-card-soft: #020617;
+            --accent: #fbbf24;
+            --accent-soft: rgba(251, 191, 36, 0.45);
+            --accent-2: #f97316;
+            --text-main: #fef3c7;
+            --text-muted: #fed7aa;
+            --border-subtle: rgba(248, 250, 252, 0.25);
+            --pattern-line: rgba(248, 250, 252, 0.2);
+        }
+
+        body[data-theme="frost-byte"] {
+            --bg: radial-gradient(circle at top left, #0ea5e9, #0284c7 70%);
+            --bg-soft: #0c4a6e;
+            --bg-card: linear-gradient(145deg, #0ea5e9, #7dd3fc);
+            --bg-card-soft: #0c4a6e;
+            --accent: #bae6fd;
+            --accent-soft: rgba(186, 230, 253, 0.45);
+            --accent-2: #0284c7;
+            --text-main: #e0f9ff;
+            --text-muted: #bae6fd;
+            --border-subtle: rgba(186, 230, 253, 0.3);
+            --pattern-line: rgba(186, 230, 253, 0.2);
+        }
+
+        body[data-theme="terminal-green"] {
+            --bg: radial-gradient(circle at top left, #022b05, #011a03 70%);
+            --bg-soft: #011a03;
+            --bg-card: linear-gradient(145deg, #025d06, #038c09);
+            --bg-card-soft: #011a03;
+            --accent: #3cf54f;
+            --accent-soft: rgba(60, 245, 79, 0.4);
+            --accent-2: #a3e635;
+            --text-main: #d1ffd6;
+            --text-muted: #a3e635;
+            --border-subtle: rgba(60, 245, 79, 0.3);
+            --pattern-line: rgba(60, 245, 79, 0.15);
+        }
+
+        body[data-theme="lavender-mist"] {
+            --bg: radial-gradient(circle at top left, #8b5cf6, #a855f7 70%);
+            --bg-soft: #3b0764;
+            --bg-card: linear-gradient(145deg, #c4b5fd, #ddd6fe);
+            --bg-card-soft: #3b0764;
+            --accent: #e9d5ff;
+            --accent-soft: rgba(233, 213, 255, 0.4);
+            --accent-2: #a855f7;
+            --text-main: #f3e8ff;
+            --text-muted: #e9d5ff;
+            --border-subtle: rgba(233, 213, 255, 0.3);
+            --pattern-line: rgba(233, 213, 255, 0.25);
+        }
+
+        body[data-theme="neon-sunset"] {
+            --bg: radial-gradient(circle at top left, #4c1d95, #020617 60%, #020617);
+            --bg-soft: #020617;
+            --bg-card: radial-gradient(circle at top right, #7c2d12, #020617 75%);
+            --bg-card-soft: #020617;
+            --accent: #fb923c;
+            --accent-soft: rgba(251, 146, 60, 0.5);
+            --accent-2: #f97316;
+            --text-main: #fffbeb;
+            --text-muted: #fed7aa;
+            --border-subtle: rgba(248, 250, 252, 0.25);
+            --pattern-line: rgba(252, 165, 165, 0.24);
+        }
+
+        body[data-theme="forest-cabin"] {
+            --bg: radial-gradient(circle at top left, #022c22, #020617 60%);
+            --bg-soft: #020617;
+            --bg-card: linear-gradient(145deg, #022c22, #064e3b);
+            --bg-card-soft: #020617;
+            --accent: #bbf7d0;
+            --accent-soft: rgba(134, 239, 172, 0.4);
+            --accent-2: #f97316;
+            --text-main: #ecfdf3;
+            --text-muted: #bbf7d0;
+            --border-subtle: rgba(22, 163, 74, 0.4);
+            --pattern-line: rgba(134, 239, 172, 0.26);
+        }
+
+        body[data-theme="midnight-blue"] {
+            --bg: linear-gradient(to bottom, #0a0a23, #16213e);
+            --bg-soft: #0a0a23;
+            --bg-card: linear-gradient(145deg, #16213e, #1e3a8a);
+            --bg-card-soft: #0a0a23;
+            --accent: #4cc9f0;
+            --accent-soft: rgba(76, 201, 240, 0.4);
+            --accent-2: #3a86ff;
+            --text-main: #e0e1ff;
+            --text-muted: #a9a9d6;
+            --border-subtle: rgba(76, 201, 240, 0.2);
+            --pattern-line: rgba(58, 134, 255, 0.2);
+        }
+
+        body[data-theme="cosmic-purple"] {
+            --bg: linear-gradient(to bottom, #2d00f7, #6a0dad);
+            --bg-soft: #2d00f7;
+            --bg-card: linear-gradient(145deg, #6a0dad, #8a2be2);
+            --bg-card-soft: #2d00f7;
+            --accent: #e0b0ff;
+            --accent-soft: rgba(224, 176, 255, 0.4);
+            --accent-2: #da70d6;
+            --text-main: #f8f8ff;
+            --text-muted: #d8bfd8;
+            --border-subtle: rgba(224, 176, 255, 0.25);
+            --pattern-line: rgba(218, 112, 214, 0.2);
+        }
+
+        body[data-theme="sunset-orange"] {
+            --bg: linear-gradient(to bottom, #ff6b35, #f7931e);
+            --bg-soft: #ff6b35;
+            --bg-card: linear-gradient(145deg, #f7931e, #ffb347);
+            --bg-card-soft: #ff6b35;
+            --accent: #fff8dc;
+            --accent-soft: rgba(255, 248, 220, 0.4);
+            --accent-2: #ffa500;
+            --text-main: #fff8dc;
+            --text-muted: #ffe4b2;
+            --border-subtle: rgba(255, 248, 220, 0.3);
+            --pattern-line: rgba(255, 165, 0, 0.2);
+        }
+
+        body[data-theme="ocean-blue"] {
+            --bg: linear-gradient(to bottom, #0077be, #00a8cc);
+            --bg-soft: #0077be;
+            --bg-card: linear-gradient(145deg, #00a8cc, #40e0d0);
+            --bg-card-soft: #0077be;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #00ced1;
+            --text-main: #ffffff;
+            --text-muted: #e0ffff;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(0, 206, 209, 0.2);
+        }
+
+        body[data-theme="emerald-green"] {
+            --bg: linear-gradient(to bottom, #006400, #228b22);
+            --bg-soft: #006400;
+            --bg-card: linear-gradient(145deg, #228b22, #3cb371);
+            --bg-card-soft: #006400;
+            --accent: #98fb98;
+            --accent-soft: rgba(152, 251, 152, 0.4);
+            --accent-2: #00ff7f;
+            --text-main: #f0fff0;
+            --text-muted: #c1ffc1;
+            --border-subtle: rgba(152, 251, 152, 0.3);
+            --pattern-line: rgba(0, 255, 127, 0.2);
+        }
+
+        body[data-theme="crimson-red"] {
+            --bg: linear-gradient(to bottom, #8b0000, #dc143c);
+            --bg-soft: #8b0000;
+            --bg-card: linear-gradient(145deg, #dc143c, #ff6347);
+            --bg-card-soft: #8b0000;
+            --accent: #ffdead;
+            --accent-soft: rgba(255, 222, 173, 0.4);
+            --accent-2: #ff4500;
+            --text-main: #fffafa;
+            --text-muted: #ffe4e1;
+            --border-subtle: rgba(255, 222, 173, 0.3);
+            --pattern-line: rgba(255, 69, 0, 0.2);
+        }
+
+        body[data-theme="gold-amber"] {
+            --bg: linear-gradient(to bottom, #b8860b, #daa520);
+            --bg-soft: #b8860b;
+            --bg-card: linear-gradient(145deg, #daa520, #ffd700);
+            --bg-card-soft: #b8860b;
+            --accent: #fffacd;
+            --accent-soft: rgba(255, 250, 205, 0.4);
+            --accent-2: #ffea00;
+            --text-main: #fff8dc;
+            --text-muted: #ffffe0;
+            --border-subtle: rgba(255, 250, 205, 0.3);
+            --pattern-line: rgba(255, 234, 0, 0.2);
+        }
+
+        body[data-theme="silver-gray"] {
+            --bg: linear-gradient(to bottom, #696969, #808080);
+            --bg-soft: #696969;
+            --bg-card: linear-gradient(145deg, #808080, #c0c0c0);
+            --bg-card-soft: #696969;
+            --accent: #f5f5f5;
+            --accent-soft: rgba(245, 245, 245, 0.4);
+            --accent-2: #dcdcdc;
+            --text-main: #ffffff;
+            --text-muted: #e0e0e0;
+            --border-subtle: rgba(245, 245, 245, 0.3);
+            --pattern-line: rgba(220, 220, 220, 0.2);
+        }
+
+        body[data-theme="royal-indigo"] {
+            --bg: linear-gradient(to bottom, #2f006e, #4b0082);
+            --bg-soft: #2f006e;
+            --bg-card: linear-gradient(145deg, #4b0082, #6a5acd);
+            --bg-card-soft: #2f006e;
+            --accent: #e6e6fa;
+            --accent-soft: rgba(230, 230, 250, 0.4);
+            --accent-2: #9370db;
+            --text-main: #f8f8ff;
+            --text-muted: #e6e6fa;
+            --border-subtle: rgba(230, 230, 250, 0.3);
+            --pattern-line: rgba(147, 112, 219, 0.2);
+        }
+
+        body[data-theme="hot-pink"] {
+            --bg: linear-gradient(to bottom, #ff69b4, #ff1493);
+            --bg-soft: #ff69b4;
+            --bg-card: linear-gradient(145deg, #ff1493, #ff6b6b);
+            --bg-card-soft: #ff69b4;
+            --accent: #ffe4e1;
+            --accent-soft: rgba(255, 228, 225, 0.4);
+            --accent-2: #ff7f50;
+            --text-main: #fffafa;
+            --text-muted: #fff0f5;
+            --border-subtle: rgba(255, 228, 225, 0.3);
+            --pattern-line: rgba(255, 127, 80, 0.2);
+        }
+
+        body[data-theme="teal-turquoise"] {
+            --bg: linear-gradient(to bottom, #008080, #40e0d0);
+            --bg-soft: #008080;
+            --bg-card: linear-gradient(145deg, #40e0d0, #00ced1);
+            --bg-card-soft: #008080;
+            --accent: #e0ffff;
+            --accent-soft: rgba(224, 255, 255, 0.4);
+            --accent-2: #20b2aa;
+            --text-main: #f0ffff;
+            --text-muted: #afeeee;
+            --border-subtle: rgba(224, 255, 255, 0.3);
+            --pattern-line: rgba(32, 178, 170, 0.2);
+        }
+
+        body[data-theme="chocolate-brown"] {
+            --bg: linear-gradient(to bottom, #5c4033, #8b4513);
+            --bg-soft: #5c4033;
+            --bg-card: linear-gradient(145deg, #8b4513, #cd853f);
+            --bg-card-soft: #5c4033;
+            --accent: #deb887;
+            --accent-soft: rgba(222, 184, 135, 0.4);
+            --accent-2: #d2691e;
+            --text-main: #f5deb3;
+            --text-muted: #d2b48c;
+            --border-subtle: rgba(222, 184, 135, 0.3);
+            --pattern-line: rgba(210, 105, 30, 0.2);
+        }
+
+        body[data-theme="slate-blue"] {
+            --bg: linear-gradient(to bottom, #6a5acd, #7b68ee);
+            --bg-soft: #6a5acd;
+            --bg-card: linear-gradient(145deg, #7b68ee, #9370db);
+            --bg-card-soft: #6a5acd;
+            --accent: #e6e6fa;
+            --accent-soft: rgba(230, 230, 250, 0.4);
+            --accent-2: #8470ff;
+            --text-main: #f8f8ff;
+            --text-muted: #e0e0ff;
+            --border-subtle: rgba(230, 230, 250, 0.3);
+            --pattern-line: rgba(132, 112, 255, 0.2);
+        }
+
+        body[data-theme="coral-salmon"] {
+            --bg: linear-gradient(to bottom, #ff7f50, #ff6347);
+            --bg-soft: #ff7f50;
+            --bg-card: linear-gradient(145deg, #ff6347, #ffa07a);
+            --bg-card-soft: #ff7f50;
+            --accent: #fff8dc;
+            --accent-soft: rgba(255, 248, 220, 0.4);
+            --accent-2: #ff8c00;
+            --text-main: #fffafa;
+            --text-muted: #ffe4e1;
+            --border-subtle: rgba(255, 248, 220, 0.3);
+            --pattern-line: rgba(255, 140, 0, 0.2);
+        }
+
+        body[data-theme="mint-cream"] {
+            --bg: linear-gradient(to bottom, #f5fffa, #e0ffe0);
+            --bg-soft: #f5fffa;
+            --bg-card: linear-gradient(145deg, #e0ffe0, #b2fab4);
+            --bg-card-soft: #f5fffa;
+            --accent: #006400;
+            --accent-soft: rgba(0, 100, 0, 0.4);
+            --accent-2: #3cb371;
+            --text-main: #006400;
+            --text-muted: #228b22;
+            --border-subtle: rgba(0, 100, 0, 0.3);
+            --pattern-line: rgba(60, 179, 113, 0.2);
+        }
+
+        body[data-theme="strawberry-lemonade"] {
+            --bg: linear-gradient(to bottom, #ff6b6b, #ffd166);
+            --bg-soft: #ff6b6b;
+            --bg-card: linear-gradient(145deg, #ffd166, #ff9f1c);
+            --bg-card-soft: #ff6b6b;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #ef476f;
+            --text-main: #333333;
+            --text-muted: #666666;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(239, 71, 111, 0.2);
+        }
+
+        body[data-theme="arctic-aurora"] {
+            --bg: linear-gradient(to bottom, #00b4db, #0083b0);
+            --bg-soft: #00b4db;
+            --bg-card: linear-gradient(145deg, #0083b0, #00b4db);
+            --bg-card-soft: #00b4db;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #2a9d8f;
+            --text-main: #ffffff;
+            --text-muted: #e0f7fa;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(42, 157, 143, 0.2);
+        }
+
+        body[data-theme="neon-circuit"] {
+            --bg: linear-gradient(to bottom, #121212, #0a0a0a);
+            --bg-soft: #121212;
+            --bg-card: linear-gradient(145deg, #00ff00, #00ffff);
+            --bg-card-soft: #121212;
+            --accent: #00ffff;
+            --accent-soft: rgba(0, 255, 255, 0.4);
+            --accent-2: #ff00ff;
+            --text-main: #ffffff;
+            --text-muted: #cccccc;
+            --border-subtle: rgba(0, 255, 255, 0.3);
+            --pattern-line: rgba(255, 0, 255, 0.2);
+        }
+
+        body[data-theme="desert-sand"] {
+            --bg: linear-gradient(to bottom, #e9dac1, #d2b48c);
+            --bg-soft: #e9dac1;
+            --bg-card: linear-gradient(145deg, #d2b48c, #f4a460);
+            --bg-card-soft: #e9dac1;
+            --accent: #8b4513;
+            --accent-soft: rgba(139, 69, 19, 0.4);
+            --accent-2: #cd853f;
+            --text-main: #8b4513;
+            --text-muted: #a0522d;
+            --border-subtle: rgba(139, 69, 19, 0.3);
+            --pattern-line: rgba(205, 133, 63, 0.2);
+        }
+
+        body[data-theme="lavender-field"] {
+            --bg: linear-gradient(to bottom, #e6e6fa, #d8bfd8);
+            --bg-soft: #e6e6fa;
+            --bg-card: linear-gradient(145deg, #d8bfd8, #dda0dd);
+            --bg-card-soft: #e6e6fa;
+            --accent: #4b0082;
+            --accent-soft: rgba(75, 0, 130, 0.4);
+            --accent-2: #9370db;
+            --text-main: #4b0082;
+            --text-muted: #6a5acd;
+            --border-subtle: rgba(75, 0, 130, 0.3);
+            --pattern-line: rgba(147, 112, 219, 0.2);
+        }
+
+        body[data-theme="mango-tango"] {
+            --bg: linear-gradient(to bottom, #ff8243, #ff4500);
+            --bg-soft: #ff8243;
+            --bg-card: linear-gradient(145deg, #ff4500, #ff6347);
+            --bg-card-soft: #ff8243;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #ffd700;
+            --text-main: #ffffff;
+            --text-muted: #ffe4b2;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(255, 215, 0, 0.2);
+        }
+
+        body[data-theme="peacock-feather"] {
+            --bg: linear-gradient(to bottom, #00688b, #00868b);
+            --bg-soft: #00688b;
+            --bg-card: linear-gradient(145deg, #00868b, #00bfff);
+            --bg-card-soft: #00688b;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #00ced1;
+            --text-main: #ffffff;
+            --text-muted: #e0ffff;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(0, 206, 209, 0.2);
+        }
+
+        body[data-theme="bubblegum-pink"] {
+            --bg: linear-gradient(to bottom, #ff69b4, #ffb6c1);
+            --bg-soft: #ff69b4;
+            --bg-card: linear-gradient(145deg, #ffb6c1, #ffc0cb);
+            --bg-card-soft: #ff69b4;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #ff1493;
+            --text-main: #8b008b;
+            --text-muted: #da70d6;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(255, 20, 147, 0.2);
+        }
+
+        body[data-theme="ice-blue"] {
+            --bg: linear-gradient(to bottom, #e0f7fa, #b2ebf2);
+            --bg-soft: #e0f7fa;
+            --bg-card: linear-gradient(145deg, #b2ebf2, #80deea);
+            --bg-card-soft: #e0f7fa;
+            --accent: #006064;
+            --accent-soft: rgba(0, 96, 100, 0.4);
+            --accent-2: #00bcd4;
+            --text-main: #006064;
+            --text-muted: #00838f;
+            --border-subtle: rgba(0, 96, 100, 0.3);
+            --pattern-line: rgba(0, 188, 212, 0.2);
+        }
+
+        body[data-theme="fire-engine-red"] {
+            --bg: linear-gradient(to bottom, #dc143c, #b22222);
+            --bg-soft: #dc143c;
+            --bg-card: linear-gradient(145deg, #b22222, #8b0000);
+            --bg-card-soft: #dc143c;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #ff4500;
+            --text-main: #ffffff;
+            --text-muted: #ffe4e1;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(255, 69, 0, 0.2);
+        }
+
+        body[data-theme="leafy-green"] {
+            --bg: linear-gradient(to bottom, #228b22, #32cd32);
+            --bg-soft: #228b22;
+            --bg-card: linear-gradient(145deg, #32cd32, #90ee90);
+            --bg-card-soft: #228b22;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #00ff00;
+            --text-main: #ffffff;
+            --text-muted: #f0fff0;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(0, 255, 0, 0.2);
+        }
+
+        body[data-theme="violet-vogue"] {
+            --bg: linear-gradient(to bottom, #8a2be2, #9400d3);
+            --bg-soft: #8a2be2;
+            --bg-card: linear-gradient(145deg, #9400d3, #ba55d3);
+            --bg-card-soft: #8a2be2;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #da70d6;
+            --text-main: #ffffff;
+            --text-muted: #e6e6fa;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(218, 112, 214, 0.2);
+        }
+
+        body[data-theme="amber-wave"] {
+            --bg: linear-gradient(to bottom, #ffbf00, #ff8c00);
+            --bg-soft: #ffbf00;
+            --bg-card: linear-gradient(145deg, #ff8c00, #ff4500);
+            --bg-card-soft: #ffbf00;
+            --accent: #000000;
+            --accent-soft: rgba(0, 0, 0, 0.4);
+            --accent-2: #ffd700;
+            --text-main: #000000;
+            --text-muted: #2f4f4f;
+            --border-subtle: rgba(0, 0, 0, 0.3);
+            --pattern-line: rgba(255, 215, 0, 0.2);
+        }
+
+        body[data-theme="charcoal-black"] {
+            --bg: linear-gradient(to bottom, #36454f, #28282b);
+            --bg-soft: #36454f;
+            --bg-card: linear-gradient(145deg, #28282b, #1c1c1e);
+            --bg-card-soft: #36454f;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #808080;
+            --text-main: #ffffff;
+            --text-muted: #d3d3d3;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(128, 128, 128, 0.2);
+        }
+
+        body[data-theme="tropical-teal"] {
+            --bg: linear-gradient(to bottom, #008080, #00bfa5);
+            --bg-soft: #008080;
+            --bg-card: linear-gradient(145deg, #00bfa5, #00e5ff);
+            --bg-card-soft: #008080;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #00bcd4;
+            --text-main: #ffffff;
+            --text-muted: #e0ffff;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(0, 188, 212, 0.2);
+        }
+
+        body[data-theme="raspberry-ripple"] {
+            --bg: linear-gradient(to bottom, #b31b42, #dc143c);
+            --bg-soft: #b31b42;
+            --bg-card: linear-gradient(145deg, #dc143c, #ff6347);
+            --bg-card-soft: #b31b42;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #ff1493;
+            --text-main: #ffffff;
+            --text-muted: #ffe4e1;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(255, 20, 147, 0.2);
+        }
+
+        body[data-theme="sky-high"] {
+            --bg: linear-gradient(to bottom, #87ceeb, #b0e0e6);
+            --bg-soft: #87ceeb;
+            --bg-card: linear-gradient(145deg, #b0e0e6, #add8e6);
+            --bg-card-soft: #87ceeb;
+            --accent: #000080;
+            --accent-soft: rgba(0, 0, 128, 0.4);
+            --accent-2: #4682b4;
+            --text-main: #000080;
+            --text-muted: #4169e1;
+            --border-subtle: rgba(0, 0, 128, 0.3);
+            --pattern-line: rgba(70, 130, 180, 0.2);
+        }
+
+        body[data-theme="cotton-candy"] {
+            --bg: linear-gradient(to bottom, #ffb6c1, #ffc0cb);
+            --bg-soft: #ffb6c1;
+            --bg-card: linear-gradient(145deg, #ffc0cb, #ffefff);
+            --bg-card-soft: #ffb6c1;
+            --accent: #ff1493;
+            --accent-soft: rgba(255, 20, 147, 0.4);
+            --accent-2: #ff69b4;
+            --text-main: #8b008b;
+            --text-muted: #da70d6;
+            --border-subtle: rgba(255, 20, 147, 0.3);
+            --pattern-line: rgba(255, 105, 180, 0.2);
+        }
+
+        body[data-theme="electric-blue"] {
+            --bg: linear-gradient(to bottom, #0000ff, #00bfff);
+            --bg-soft: #0000ff;
+            --bg-card: linear-gradient(145deg, #00bfff, #87cefa);
+            --bg-card-soft: #0000ff;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #00ffff;
+            --text-main: #ffffff;
+            --text-muted: #e0f6ff;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(0, 255, 255, 0.2);
+        }
+
+        body[data-theme="ruby-red"] {
+            --bg: linear-gradient(to bottom, #cc0000, #8b0000);
+            --bg-soft: #cc0000;
+            --bg-card: linear-gradient(145deg, #8b0000, #b22222);
+            --bg-card-soft: #cc0000;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #ff4500;
+            --text-main: #ffffff;
+            --text-muted: #ffe4e1;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(255, 69, 0, 0.2);
+        }
+
+        body[data-theme="sunshine-yellow"] {
+            --bg: linear-gradient(to bottom, #ffff00, #ffd700);
+            --bg-soft: #ffff00;
+            --bg-card: linear-gradient(145deg, #ffd700, #ffec8b);
+            --bg-card-soft: #ffff00;
+            --accent: #000000;
+            --accent-soft: rgba(0, 0, 0, 0.4);
+            --accent-2: #ff8c00;
+            --text-main: #000000;
+            --text-muted: #2f4f4f;
+            --border-subtle: rgba(0, 0, 0, 0.3);
+            --pattern-line: rgba(255, 140, 0, 0.2);
+        }
+
+        body[data-theme="moonless-night"] {
+            --bg: linear-gradient(to bottom, #000000, #1a1a1a);
+            --bg-soft: #000000;
+            --bg-card: linear-gradient(145deg, #1a1a1a, #2d2d2d);
+            --bg-card-soft: #000000;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #808080;
+            --text-main: #ffffff;
+            --text-muted: #a9a9a9;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(128, 128, 128, 0.2);
+        }
+
+        body[data-theme="spring-blossom"] {
+            --bg: linear-gradient(to bottom, #ffb7c5, #f5b7b1);
+            --bg-soft: #ffb7c5;
+            --bg-card: linear-gradient(145deg, #f5b7b1, #d5f5e3);
+            --bg-card-soft: #ffb7c5;
+            --accent: #27ae60;
+            --accent-soft: rgba(39, 174, 96, 0.4);
+            --accent-2: #2980b9;
+            --text-main: #2c3e50;
+            --text-muted: #7f8c8d;
+            --border-subtle: rgba(39, 174, 96, 0.3);
+            --pattern-line: rgba(41, 128, 185, 0.2);
+        }
+
+        body[data-theme="autumn-foliage"] {
+            --bg: linear-gradient(to bottom, #cd5c5c, #daa520);
+            --bg-soft: #cd5c5c;
+            --bg-card: linear-gradient(145deg, #daa520, #f08080);
+            --bg-card-soft: #cd5c5c;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #d2691e;
+            --text-main: #ffffff;
+            --text-muted: #ffe4e1;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(210, 105, 30, 0.2);
+        }
+
+        body[data-theme="winter-wonderland"] {
+            --bg: linear-gradient(to bottom, #e0f6ff, #b0e0e6);
+            --bg-soft: #e0f6ff;
+            --bg-card: linear-gradient(145deg, #b0e0e6, #e6f3ff);
+            --bg-card-soft: #e0f6ff;
+            --accent: #1e90ff;
+            --accent-soft: rgba(30, 144, 255, 0.4);
+            --accent-2: #00ced1;
+            --text-main: #1e90ff;
+            --text-muted: #4682b4;
+            --border-subtle: rgba(30, 144, 255, 0.3);
+            --pattern-line: rgba(0, 206, 209, 0.2);
+        }
+
+        body[data-theme="galactic-core"] {
+            --bg: radial-gradient(circle at center, #000000, #1a0033, #000000);
+            --bg-soft: #000000;
+            --bg-card: linear-gradient(145deg, #4b0082, #000080);
+            --bg-card-soft: #000000;
+            --accent: #00ffff;
+            --accent-soft: rgba(0, 255, 255, 0.4);
+            --accent-2: #ff00ff;
+            --text-main: #ffffff;
+            --text-muted: #cccccc;
+            --border-subtle: rgba(0, 255, 255, 0.3);
+            --pattern-line: rgba(255, 0, 255, 0.2);
+        }
+
+        body[data-theme="lava-flow"] {
+            --bg: linear-gradient(to bottom, #ff0000, #ff8c00);
+            --bg-soft: #ff0000;
+            --bg-card: linear-gradient(145deg, #ff8c00, #ff4500);
+            --bg-card-soft: #ff0000;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #ffff00;
+            --text-main: #ffffff;
+            --text-muted: #ffe4e1;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(255, 255, 0, 0.2);
+        }
+
+        body[data-theme="rainbow-spectrum"] {
+            --bg: linear-gradient(45deg, red, orange, yellow, green, blue, indigo, violet);
+            --bg-soft: #4b0082;
+            --bg-card: linear-gradient(145deg, #9400d3, #4b0082);
+            --bg-card-soft: #4b0082;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #00ff00;
+            --text-main: #ffffff;
+            --text-muted: #e6e6fa;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(0, 255, 0, 0.2);
+        }
+
+        body[data-theme="carbon-fiber"] {
+            --bg: url('https://www.transparenttextures.com/patterns/carbon-fibre.png'), linear-gradient(to bottom, #2c2c2c, #1a1a1a);
+            --bg-soft: #2c2c2c;
+            --bg-card: linear-gradient(145deg, #1a1a1a, #0d0d0d);
+            --bg-card-soft: #2c2c2c;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #aaaaaa;
+            --text-main: #ffffff;
+            --text-muted: #cccccc;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(170, 170, 170, 0.2);
+        }
+
+        body[data-theme="wood-grain"] {
+            --bg: url('https://www.transparenttextures.com/patterns/wood-pattern.png'), linear-gradient(to bottom, #8b4513, #a0522d);
+            --bg-soft: #8b4513;
+            --bg-card: linear-gradient(145deg, #a0522d, #cd853f);
+            --bg-card-soft: #8b4513;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #deb887;
+            --text-main: #ffffff;
+            --text-muted: #d2b48c;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(222, 184, 135, 0.2);
+        }
+
+        body[data-theme="marble"] {
+            --bg: url('https://www.transparenttextures.com/patterns/marble.png'), linear-gradient(to bottom, #f5f5f5, #e0e0e0);
+            --bg-soft: #f5f5f5;
+            --bg-card: linear-gradient(145deg, #e0e0e0, #d0d0d0);
+            --bg-card-soft: #f5f5f5;
+            --accent: #000000;
+            --accent-soft: rgba(0, 0, 0, 0.4);
+            --accent-2: #808080;
+            --text-main: #000000;
+            --text-muted: #404040;
+            --border-subtle: rgba(0, 0, 0, 0.3);
+            --pattern-line: rgba(128, 128, 128, 0.2);
+        }
+
+        body[data-theme="hexagon"] {
+            --bg: url('https://www.transparenttextures.com/patterns/hexellence.png'), linear-gradient(to bottom, #1e3c72, #2a5298);
+            --bg-soft: #1e3c72;
+            --bg-card: linear-gradient(145deg, #2a5298, #3a7bd5);
+            --bg-card-soft: #1e3c72;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #00bfff;
+            --text-main: #ffffff;
+            --text-muted: #e0f7ff;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(0, 191, 255, 0.2);
+        }
+
+        body[data-theme="concrete"] {
+            --bg: url('https://www.transparenttextures.com/patterns/concrete-wall.png'), linear-gradient(to bottom, #999999, #7a7a7a);
+            --bg-soft: #999999;
+            --bg-card: linear-gradient(145deg, #7a7a7a, #666666);
+            --bg-card-soft: #999999;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #aaaaaa;
+            --text-main: #ffffff;
+            --text-muted: #dcdcdc;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(170, 170, 170, 0.2);
+        }
+
+        body[data-theme="fabric"] {
+            --bg: url('https://www.transparenttextures.com/patterns/fabric-plaid.png'), linear-gradient(to bottom, #e6e6fa, #d8bfd8);
+            --bg-soft: #e6e6fa;
+            --bg-card: linear-gradient(145deg, #d8bfd8, #dda0dd);
+            --bg-card-soft: #e6e6fa;
+            --accent: #4b0082;
+            --accent-soft: rgba(75, 0, 130, 0.4);
+            --accent-2: #9370db;
+            --text-main: #4b0082;
+            --text-muted: #6a5acd;
+            --border-subtle: rgba(75, 0, 130, 0.3);
+            --pattern-line: rgba(147, 112, 219, 0.2);
+        }
+
+        body[data-theme="diamond"] {
+            --bg: url('https://www.transparenttextures.com/patterns/diamond-upholstery.png'), linear-gradient(to bottom, #2c3e50, #1a2530);
+            --bg-soft: #2c3e50;
+            --bg-card: linear-gradient(145deg, #1a2530, #0f1a25);
+            --bg-card-soft: #2c3e50;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #3498db;
+            --text-main: #ffffff;
+            --text-muted: #bdc3c7;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(52, 152, 219, 0.2);
+        }
+
+        body[data-theme="checkerboard"] {
+            --bg: url('https://www.transparenttextures.com/patterns/checkerboard.png'), linear-gradient(to bottom, #2c2c2c, #1a1a1a);
+            --bg-soft: #2c2c2c;
+            --bg-card: linear-gradient(145deg, #1a1a1a, #0d0d0d);
+            --bg-card-soft: #2c2c2c;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #ff0000;
+            --text-main: #ffffff;
+            --text-muted: #cccccc;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(255, 0, 0, 0.2);
+        }
+
+        body[data-theme="waves"] {
+            --bg: url('https://www.transparenttextures.com/patterns/wavecut.png'), linear-gradient(to bottom, #0077be, #00a8cc);
+            --bg-soft: #0077be;
+            --bg-card: linear-gradient(145deg, #00a8cc, #40e0d0);
+            --bg-card-soft: #0077be;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #00ced1;
+            --text-main: #ffffff;
+            --text-muted: #e0ffff;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(0, 206, 209, 0.2);
+        }
+
+        body[data-theme="grid"] {
+            --bg: url('https://www.transparenttextures.com/patterns/grid.png'), linear-gradient(to bottom, #1e293b, #0f172a);
+            --bg-soft: #1e293b;
+            --bg-card: linear-gradient(145deg, #0f172a, #0c1a2d);
+            --bg-card-soft: #1e293b;
+            --accent: #38bdf8;
+            --accent-soft: rgba(56, 189, 248, 0.4);
+            --accent-2: #a855f7;
+            --text-main: #e0f2fe;
+            --text-muted: #94a3b8;
+            --border-subtle: rgba(148, 163, 184, 0.3);
+            --pattern-line: rgba(168, 85, 247, 0.2);
+        }
+
+        body[data-theme="paper"] {
+            --bg: url('https://www.transparenttextures.com/patterns/old-paper.png'), linear-gradient(to bottom, #f5f1e6, #e8e2d1);
+            --bg-soft: #f5f1e6;
+            --bg-card: linear-gradient(145deg, #e8e2d1, #dcd0c0);
+            --bg-card-soft: #f5f1e6;
+            --accent: #8b4513;
+            --accent-soft: rgba(139, 69, 19, 0.4);
+            --accent-2: #cd853f;
+            --text-main: #8b4513;
+            --text-muted: #a0522d;
+            --border-subtle: rgba(139, 69, 19, 0.3);
+            --pattern-line: rgba(205, 133, 63, 0.2);
+        }
+
+        body[data-theme="leather"] {
+            --bg: url('https://www.transparenttextures.com/patterns/leather.png'), linear-gradient(to bottom, #8b4513, #a0522d);
+            --bg-soft: #8b4513;
+            --bg-card: linear-gradient(145deg, #a0522d, #cd853f);
+            --bg-card-soft: #8b4513;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #deb887;
+            --text-main: #ffffff;
+            --text-muted: #d2b48c;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(222, 184, 135, 0.2);
+        }
+
+        body[data-theme="metal"] {
+            --bg: url('https://www.transparenttextures.com/patterns/metal.png'), linear-gradient(to bottom, #7a8c99, #5a6b7d);
+            --bg-soft: #7a8c99;
+            --bg-card: linear-gradient(145deg, #5a6b7d, #4a5b6d);
+            --bg-card-soft: #7a8c99;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #c0c0c0;
+            --text-main: #ffffff;
+            --text-muted: #dcdcdc;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(192, 192, 192, 0.2);
+        }
+
+        body[data-theme="rust"] {
+            --bg: url('https://www.transparenttextures.com/patterns/rust.png'), linear-gradient(to bottom, #8b0000, #a52a2a);
+            --bg-soft: #8b0000;
+            --bg-card: linear-gradient(145deg, #a52a2a, #b22222);
+            --bg-card-soft: #8b0000;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #ff4500;
+            --text-main: #ffffff;
+            --text-muted: #ffe4e1;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(255, 69, 0, 0.2);
+        }
+
+        body[data-theme="sand"] {
+            --bg: url('https://www.transparenttextures.com/patterns/sand.png'), linear-gradient(to bottom, #e9dac1, #d2b48c);
+            --bg-soft: #e9dac1;
+            --bg-card: linear-gradient(145deg, #d2b48c, #f4a460);
+            --bg-card-soft: #e9dac1;
+            --accent: #8b4513;
+            --accent-soft: rgba(139, 69, 19, 0.4);
+            --accent-2: #cd853f;
+            --text-main: #8b4513;
+            --text-muted: #a0522d;
+            --border-subtle: rgba(139, 69, 19, 0.3);
+            --pattern-line: rgba(205, 133, 63, 0.2);
+        }
+
+        body[data-theme="stone"] {
+            --bg: url('https://www.transparenttextures.com/patterns/stone.png'), linear-gradient(to bottom, #696969, #808080);
+            --bg-soft: #696969;
+            --bg-card: linear-gradient(145deg, #808080, #a9a9a9);
+            --bg-card-soft: #696969;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #c0c0c0;
+            --text-main: #ffffff;
+            --text-muted: #e0e0e0;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(192, 192, 192, 0.2);
+        }
+
+        body[data-theme="water"] {
+            --bg: url('https://www.transparenttextures.com/patterns/water.png'), linear-gradient(to bottom, #0077be, #00a8cc);
+            --bg-soft: #0077be;
+            --bg-card: linear-gradient(145deg, #00a8cc, #40e0d0);
+            --bg-card-soft: #0077be;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #00ced1;
+            --text-main: #ffffff;
+            --text-muted: #e0ffff;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(0, 206, 209, 0.2);
+        }
+
+        body[data-theme="wood-light"] {
+            --bg: url('https://www.transparenttextures.com/patterns/wood-pattern-light.png'), linear-gradient(to bottom, #f5deb3, #e6d3a7);
+            --bg-soft: #f5deb3;
+            --bg-card: linear-gradient(145deg, #e6d3a7, #d8c39c);
+            --bg-card-soft: #f5deb3;
+            --accent: #8b4513;
+            --accent-soft: rgba(139, 69, 19, 0.4);
+            --accent-2: #cd853f;
+            --text-main: #8b4513;
+            --text-muted: #a0522d;
+            --border-subtle: rgba(139, 69, 19, 0.3);
+            --pattern-line: rgba(205, 133, 63, 0.2);
+        }
+
+        body[data-theme="wood-dark"] {
+            --bg: url('https://www.transparenttextures.com/patterns/wood-pattern-dark.png'), linear-gradient(to bottom, #5d4037, #4e342e);
+            --bg-soft: #5d4037;
+            --bg-card: linear-gradient(145deg, #4e342e, #3e2723);
+            --bg-card-soft: #5d4037;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #d7ccc8;
+            --text-main: #ffffff;
+            --text-muted: #efebe9;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(215, 204, 200, 0.2);
+        }
+
+        body[data-theme="space-station"] {
+            --bg: radial-gradient(circle at center, #000000, #0a0a23, #000000);
+            --bg-soft: #0a0a23;
+            --bg-card: linear-gradient(145deg, #0f172a, #1a2130);
+            --bg-card-soft: #0a0a23;
+            --accent: #00ffff;
+            --accent-soft: rgba(0, 255, 255, 0.4);
+            --accent-2: #ff00ff;
+            --text-main: #ffffff;
+            --text-muted: #cccccc;
+            --border-subtle: rgba(0, 255, 255, 0.3);
+            --pattern-line: rgba(255, 0, 255, 0.2);
+        }
+
+        body[data-theme="jungle-vines"] {
+            --bg: url('https://www.transparenttextures.com/patterns/jungle-vines.png'), linear-gradient(to bottom, #228b22, #006400);
+            --bg-soft: #228b22;
+            --bg-card: linear-gradient(145deg, #006400, #2e8b57);
+            --bg-card-soft: #228b22;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #32cd32;
+            --text-main: #ffffff;
+            --text-muted: #f0fff0;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(50, 205, 50, 0.2);
+        }
+
+        body[data-theme="underwater"] {
+            --bg: url('https://www.transparenttextures.com/patterns/bubbles.png'), linear-gradient(to bottom, #0077be, #00a8cc);
+            --bg-soft: #0077be;
+            --bg-card: linear-gradient(145deg, #00a8cc, #40e0d0);
+            --bg-card-soft: #0077be;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #00ced1;
+            --text-main: #ffffff;
+            --text-muted: #e0ffff;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(0, 206, 209, 0.2);
+        }
+
+        body[data-theme="volcanic-rock"] {
+            --bg: url('https://www.transparenttextures.com/patterns/volcanic-rock.png'), linear-gradient(to bottom, #8b0000, #a52a2a);
+            --bg-soft: #8b0000;
+            --bg-card: linear-gradient(145deg, #a52a2a, #b22222);
+            --bg-card-soft: #8b0000;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #ff4500;
+            --text-main: #ffffff;
+            --text-muted: #ffe4e1;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(255, 69, 0, 0.2);
+        }
+
+        body[data-theme="starry-night"] {
+            --bg: url('https://www.transparenttextures.com/patterns/stardust.png'), radial-gradient(circle at center, #000000, #0a0a23);
+            --bg-soft: #0a0a23;
+            --bg-card: linear-gradient(145deg, #0f172a, #1a2130);
+            --bg-card-soft: #0a0a23;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #3498db;
+            --text-main: #ffffff;
+            --text-muted: #bdc3c7;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(52, 152, 219, 0.2);
+        }
+
+        body[data-theme="circuit-board"] {
+            --bg: url('https://www.transparenttextures.com/patterns/circuit.png'), linear-gradient(to bottom, #1e293b, #0f172a);
+            --bg-soft: #1e293b;
+            --bg-card: linear-gradient(145deg, #0f172a, #0c1a2d);
+            --bg-card-soft: #1e293b;
+            --accent: #00ff00;
+            --accent-soft: rgba(0, 255, 0, 0.4);
+            --accent-2: #00ffff;
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
+            --border-subtle: rgba(0, 255, 0, 0.3);
+            --pattern-line: rgba(0, 255, 255, 0.2);
+        }
+
+        body[data-theme="glacier"] {
+            --bg: url('https://www.transparenttextures.com/patterns/glacier.png'), linear-gradient(to bottom, #e0f7fa, #b2ebf2);
+            --bg-soft: #e0f7fa;
+            --bg-card: linear-gradient(145deg, #b2ebf2, #80deea);
+            --bg-card-soft: #e0f7fa;
+            --accent: #006064;
+            --accent-soft: rgba(0, 96, 100, 0.4);
+            --accent-2: #00bcd4;
+            --text-main: #006064;
+            --text-muted: #00838f;
+            --border-subtle: rgba(0, 96, 100, 0.3);
+            --pattern-line: rgba(0, 188, 212, 0.2);
+        }
+
+        body[data-theme="cracked-earth"] {
+            --bg: url('https://www.transparenttextures.com/patterns/cracked-earth.png'), linear-gradient(to bottom, #8b4513, #a0522d);
+            --bg-soft: #8b4513;
+            --bg-card: linear-gradient(145deg, #a0522d, #cd853f);
+            --bg-card-soft: #8b4513;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #deb887;
+            --text-main: #ffffff;
+            --text-muted: #d2b48c;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(222, 184, 135, 0.2);
+        }
+
+        body[data-theme="plaid"] {
+            --bg: url('https://www.transparenttextures.com/patterns/plaid.png'), linear-gradient(to bottom, #e6e6fa, #d8bfd8);
+            --bg-soft: #e6e6fa;
+            --bg-card: linear-gradient(145deg, #d8bfd8, #dda0dd);
+            --bg-card-soft: #e6e6fa;
+            --accent: #4b0082;
+            --accent-soft: rgba(75, 0, 130, 0.4);
+            --accent-2: #9370db;
+            --text-main: #4b0082;
+            --text-muted: #6a5acd;
+            --border-subtle: rgba(75, 0, 130, 0.3);
+            --pattern-line: rgba(147, 112, 219, 0.2);
+        }
+
+        body[data-theme="polka-dot"] {
+            --bg: url('https://www.transparenttextures.com/patterns/polka-dots.png'), linear-gradient(to bottom, #ffffff, #f5f5f5);
+            --bg-soft: #ffffff;
+            --bg-card: linear-gradient(145deg, #f5f5f5, #ebebeb);
+            --bg-card-soft: #ffffff;
+            --accent: #000000;
+            --accent-soft: rgba(0, 0, 0, 0.4);
+            --accent-2: #808080;
+            --text-main: #000000;
+            --text-muted: #404040;
+            --border-subtle: rgba(0, 0, 0, 0.3);
+            --pattern-line: rgba(128, 128, 128, 0.2);
+        }
+
+        body[data-theme="stripes"] {
+            --bg: url('https://www.transparenttextures.com/patterns/stripes.png'), linear-gradient(to bottom, #f0f8ff, #e6e6fa);
+            --bg-soft: #f0f8ff;
+            --bg-card: linear-gradient(145deg, #e6e6fa, #dcdcff);
+            --bg-card-soft: #f0f8ff;
+            --accent: #4b0082;
+            --accent-soft: rgba(75, 0, 130, 0.4);
+            --accent-2: #9370db;
+            --text-main: #4b0082;
+            --text-muted: #6a5acd;
+            --border-subtle: rgba(75, 0, 130, 0.3);
+            --pattern-line: rgba(147, 112, 219, 0.2);
+        }
+
+        body[data-theme="crosshatch"] {
+            --bg: url('https://www.transparenttextures.com/patterns/crosshatch.png'), linear-gradient(to bottom, #2c2c2c, #1a1a1a);
+            --bg-soft: #2c2c2c;
+            --bg-card: linear-gradient(145deg, #1a1a1a, #0d0d0d);
+            --bg-card-soft: #2c2c2c;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #aaaaaa;
+            --text-main: #ffffff;
+            --text-muted: #cccccc;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(170, 170, 170, 0.2);
+        }
+
+        body[data-theme="zigzag"] {
+            --bg: url('https://www.transparenttextures.com/patterns/zigzag.png'), linear-gradient(to bottom, #ff6b6b, #ffd166);
+            --bg-soft: #ff6b6b;
+            --bg-card: linear-gradient(145deg, #ffd166, #ff9f1c);
+            --bg-card-soft: #ff6b6b;
+            --accent: #000000;
+            --accent-soft: rgba(0, 0, 0, 0.4);
+            --accent-2: #ef476f;
+            --text-main: #000000;
+            --text-muted: #2f4f4f;
+            --border-subtle: rgba(0, 0, 0, 0.3);
+            --pattern-line: rgba(239, 71, 111, 0.2);
+        }
+
+        body[data-theme="diagonal-lines"] {
+            --bg: url('https://www.transparenttextures.com/patterns/diagonal-noise.png'), linear-gradient(to bottom, #1e293b, #0f172a);
+            --bg-soft: #1e293b;
+            --bg-card: linear-gradient(145deg, #0f172a, #0c1a2d);
+            --bg-card-soft: #1e293b;
+            --accent: #38bdf8;
+            --accent-soft: rgba(56, 189, 248, 0.4);
+            --accent-2: #a855f7;
+            --text-main: #e0f2fe;
+            --text-muted: #94a3b8;
+            --border-subtle: rgba(148, 163, 184, 0.3);
+            --pattern-line: rgba(168, 85, 247, 0.2);
+        }
+
+        body[data-theme="bricks"] {
+            --bg: url('https://www.transparenttextures.com/patterns/bricks.png'), linear-gradient(to bottom, #8b4513, #a0522d);
+            --bg-soft: #8b4513;
+            --bg-card: linear-gradient(145deg, #a0522d, #cd853f);
+            --bg-card-soft: #8b4513;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #deb887;
+            --text-main: #ffffff;
+            --text-muted: #d2b48c;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(222, 184, 135, 0.2);
+        }
+
+        body[data-theme="honeycomb"] {
+            --bg: url('https://www.transparenttextures.com/patterns/honeycomb.png'), linear-gradient(to bottom, #f5f1e6, #e8e2d1);
+            --bg-soft: #f5f1e6;
+            --bg-card: linear-gradient(145deg, #e8e2d1, #dcd0c0);
+            --bg-card-soft: #f5f1e6;
+            --accent: #8b4513;
+            --accent-soft: rgba(139, 69, 19, 0.4);
+            --accent-2: #cd853f;
+            --text-main: #8b4513;
+            --text-muted: #a0522d;
+            --border-subtle: rgba(139, 69, 19, 0.3);
+            --pattern-line: rgba(205, 133, 63, 0.2);
+        }
+
+        body[data-theme="tile"] {
+            --bg: url('https://www.transparenttextures.com/patterns/tile.png'), linear-gradient(to bottom, #696969, #808080);
+            --bg-soft: #696969;
+            --bg-card: linear-gradient(145deg, #808080, #a9a9a9);
+            --bg-card-soft: #696969;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #c0c0c0;
+            --text-main: #ffffff;
+            --text-muted: #e0e0e0;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(192, 192, 192, 0.2);
+        }
+
+        body[data-theme="lined-paper"] {
+            --bg: url('https://www.transparenttextures.com/patterns/lined-paper.png'), linear-gradient(to bottom, #f8f9fa, #e9ecef);
+            --bg-soft: #f8f9fa;
+            --bg-card: linear-gradient(145deg, #e9ecef, #dee2e6);
+            --bg-card-soft: #f8f9fa;
+            --accent: #495057;
+            --accent-soft: rgba(73, 80, 87, 0.4);
+            --accent-2: #6c757d;
+            --text-main: #495057;
+            --text-muted: #6c757d;
+            --border-subtle: rgba(73, 80, 87, 0.3);
+            --pattern-line: rgba(108, 117, 125, 0.2);
+        }
+
+        body[data-theme="graph-paper"] {
+            --bg: url('https://www.transparenttextures.com/patterns/graphy.png'), linear-gradient(to bottom, #f8f9fa, #e9ecef);
+            --bg-soft: #f8f9fa;
+            --bg-card: linear-gradient(145deg, #e9ecef, #dee2e6);
+            --bg-card-soft: #f8f9fa;
+            --accent: #495057;
+            --accent-soft: rgba(73, 80, 87, 0.4);
+            --accent-2: #6c757d;
+            --text-main: #495057;
+            --text-muted: #6c757d;
+            --border-subtle: rgba(73, 80, 87, 0.3);
+            --pattern-line: rgba(108, 117, 125, 0.2);
+        }
+
+        body[data-theme="music-notes"] {
+            --bg: url('https://www.transparenttextures.com/patterns/music.png'), linear-gradient(to bottom, #1e293b, #0f172a);
+            --bg-soft: #1e293b;
+            --bg-card: linear-gradient(145deg, #0f172a, #0c1a2d);
+            --bg-card-soft: #1e293b;
+            --accent: #38bdf8;
+            --accent-soft: rgba(56, 189, 248, 0.4);
+            --accent-2: #a855f7;
+            --text-main: #e0f2fe;
+            --text-muted: #94a3b8;
+            --border-subtle: rgba(148, 163, 184, 0.3);
+            --pattern-line: rgba(168, 85, 247, 0.2);
+        }
+
+        body[data-theme="hearts"] {
+            --bg: url('https://www.transparenttextures.com/patterns/hearts.png'), linear-gradient(to bottom, #ffb6c1, #ffc0cb);
+            --bg-soft: #ffb6c1;
+            --bg-card: linear-gradient(145deg, #ffc0cb, #ffefff);
+            --bg-card-soft: #ffb6c1;
+            --accent: #ff1493;
+            --accent-soft: rgba(255, 20, 147, 0.4);
+            --accent-2: #ff69b4;
+            --text-main: #8b008b;
+            --text-muted: #da70d6;
+            --border-subtle: rgba(255, 20, 147, 0.3);
+            --pattern-line: rgba(255, 105, 180, 0.2);
+        }
+
+        body[data-theme="stars"] {
+            --bg: url('https://www.transparenttextures.com/patterns/stars.png'), radial-gradient(circle at center, #000000, #0a0a23);
+            --bg-soft: #0a0a23;
+            --bg-card: linear-gradient(145deg, #0f172a, #1a2130);
+            --bg-card-soft: #0a0a23;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #3498db;
+            --text-main: #ffffff;
+            --text-muted: #bdc3c7;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(52, 152, 219, 0.2);
+        }
+
+        body[data-theme="clouds"] {
+            --bg: url('https://www.transparenttextures.com/patterns/clouds.png'), linear-gradient(to bottom, #e0f7fa, #b2ebf2);
+            --bg-soft: #e0f7fa;
+            --bg-card: linear-gradient(145deg, #b2ebf2, #80deea);
+            --bg-card-soft: #e0f7fa;
+            --accent: #006064;
+            --accent-soft: rgba(0, 96, 100, 0.4);
+            --accent-2: #00bcd4;
+            --text-main: #006064;
+            --text-muted: #00838f;
+            --border-subtle: rgba(0, 96, 100, 0.3);
+            --pattern-line: rgba(0, 188, 212, 0.2);
+        }
+
+        body[data-theme="leaves"] {
+            --bg: url('https://www.transparenttextures.com/patterns/leaves.png'), linear-gradient(to bottom, #228b22, #006400);
+            --bg-soft: #228b22;
+            --bg-card: linear-gradient(145deg, #006400, #2e8b57);
+            --bg-card-soft: #228b22;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #32cd32;
+            --text-main: #ffffff;
+            --text-muted: #f0fff0;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(50, 205, 50, 0.2);
+        }
+
+        body[data-theme="flowers"] {
+            --bg: url('https://www.transparenttextures.com/patterns/flowers.png'), linear-gradient(to bottom, #e6e6fa, #d8bfd8);
+            --bg-soft: #e6e6fa;
+            --bg-card: linear-gradient(145deg, #d8bfd8, #dda0dd);
+            --bg-card-soft: #e6e6fa;
+            --accent: #4b0082;
+            --accent-soft: rgba(75, 0, 130, 0.4);
+            --accent-2: #9370db;
+            --text-main: #4b0082;
+            --text-muted: #6a5acd;
+            --border-subtle: rgba(75, 0, 130, 0.3);
+            --pattern-line: rgba(147, 112, 219, 0.2);
+        }
+
+        body[data-theme="bubbles"] {
+            --bg: url('https://www.transparenttextures.com/patterns/bubbles.png'), linear-gradient(to bottom, #e0f7fa, #b2ebf2);
+            --bg-soft: #e0f7fa;
+            --bg-card: linear-gradient(145deg, #b2ebf2, #80deea);
+            --bg-card-soft: #e0f7fa;
+            --accent: #006064;
+            --accent-soft: rgba(0, 96, 100, 0.4);
+            --accent-2: #00bcd4;
+            --text-main: #006064;
+            --text-muted: #00838f;
+            --border-subtle: rgba(0, 96, 100, 0.3);
+            --pattern-line: rgba(0, 188, 212, 0.2);
+        }
+
+        body[data-theme="dots"] {
+            --bg: url('https://www.transparenttextures.com/patterns/dots.png'), linear-gradient(to bottom, #f8f9fa, #e9ecef);
+            --bg-soft: #f8f9fa;
+            --bg-card: linear-gradient(145deg, #e9ecef, #dee2e6);
+            --bg-card-soft: #f8f9fa;
+            --accent: #495057;
+            --accent-soft: rgba(73, 80, 87, 0.4);
+            --accent-2: #6c757d;
+            --text-main: #495057;
+            --text-muted: #6c757d;
+            --border-subtle: rgba(73, 80, 87, 0.3);
+            --pattern-line: rgba(108, 117, 125, 0.2);
+        }
+
+        body[data-theme="maze"] {
+            --bg: url('https://www.transparenttextures.com/patterns/maze.png'), linear-gradient(to bottom, #2c2c2c, #1a1a1a);
+            --bg-soft: #2c2c2c;
+            --bg-card: linear-gradient(145deg, #1a1a1a, #0d0d0d);
+            --bg-card-soft: #2c2c2c;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #aaaaaa;
+            --text-main: #ffffff;
+            --text-muted: #cccccc;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(170, 170, 170, 0.2);
+        }
+
+        body[data-theme="triangles"] {
+            --bg: url('https://www.transparenttextures.com/patterns/triangles.png'), linear-gradient(to bottom, #ff6b6b, #ffd166);
+            --bg-soft: #ff6b6b;
+            --bg-card: linear-gradient(145deg, #ffd166, #ff9f1c);
+            --bg-card-soft: #ff6b6b;
+            --accent: #000000;
+            --accent-soft: rgba(0, 0, 0, 0.4);
+            --accent-2: #ef476f;
+            --text-main: #000000;
+            --text-muted: #2f4f4f;
+            --border-subtle: rgba(0, 0, 0, 0.3);
+            --pattern-line: rgba(239, 71, 111, 0.2);
+        }
+
+        body[data-theme="pyramids"] {
+            --bg: url('https://www.transparenttextures.com/patterns/pyramids.png'), linear-gradient(to bottom, #cd853f, #d2b48c);
+            --bg-soft: #cd853f;
+            --bg-card: linear-gradient(145deg, #d2b48c, #e6c2a9);
+            --bg-card-soft: #cd853f;
+            --accent: #8b4513;
+            --accent-soft: rgba(139, 69, 19, 0.4);
+            --accent-2: #a0522d;
+            --text-main: #8b4513;
+            --text-muted: #a0522d;
+            --border-subtle: rgba(139, 69, 19, 0.3);
+            --pattern-line: rgba(160, 82, 45, 0.2);
+        }
+
+        body[data-theme="squares"] {
+            --bg: url('https://www.transparenttextures.com/patterns/squares.png'), linear-gradient(to bottom, #f8f9fa, #e9ecef);
+            --bg-soft: #f8f9fa;
+            --bg-card: linear-gradient(145deg, #e9ecef, #dee2e6);
+            --bg-card-soft: #f8f9fa;
+            --accent: #495057;
+            --accent-soft: rgba(73, 80, 87, 0.4);
+            --accent-2: #6c757d;
+            --text-main: #495057;
+            --text-muted: #6c757d;
+            --border-subtle: rgba(73, 80, 87, 0.3);
+            --pattern-line: rgba(108, 117, 125, 0.2);
+        }
+
+        body[data-theme="waffle"] {
+            --bg: url('https://www.transparenttextures.com/patterns/waffle.png'), linear-gradient(to bottom, #f5f1e6, #e8e2d1);
+            --bg-soft: #f5f1e6;
+            --bg-card: linear-gradient(145deg, #e8e2d1, #dcd0c0);
+            --bg-card-soft: #f5f1e6;
+            --accent: #8b4513;
+            --accent-soft: rgba(139, 69, 19, 0.4);
+            --accent-2: #cd853f;
+            --text-main: #8b4513;
+            --text-muted: #a0522d;
+            --border-subtle: rgba(139, 69, 19, 0.3);
+            --pattern-line: rgba(205, 133, 63, 0.2);
+        }
+
+        body[data-theme="waves-diagonal"] {
+            --bg: url('https://www.transparenttextures.com/patterns/wave-diagonal.png'), linear-gradient(to bottom, #0077be, #00a8cc);
+            --bg-soft: #0077be;
+            --bg-card: linear-gradient(145deg, #00a8cc, #40e0d0);
+            --bg-card-soft: #0077be;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #00ced1;
+            --text-main: #ffffff;
+            --text-muted: #e0ffff;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(0, 206, 209, 0.2);
+        }
+
+        body[data-theme="grid-large"] {
+            --bg: url('https://www.transparenttextures.com/patterns/grid-large.png'), linear-gradient(to bottom, #1e293b, #0f172a);
+            --bg-soft: #1e293b;
+            --bg-card: linear-gradient(145deg, #0f172a, #0c1a2d);
+            --bg-card-soft: #1e293b;
+            --accent: #38bdf8;
+            --accent-soft: rgba(56, 189, 248, 0.4);
+            --accent-2: #a855f7;
+            --text-main: #e0f2fe;
+            --text-muted: #94a3b8;
+            --border-subtle: rgba(148, 163, 184, 0.3);
+            --pattern-line: rgba(168, 85, 247, 0.2);
+        }
+
+        body[data-theme="grid-small"] {
+            --bg: url('https://www.transparenttextures.com/patterns/grid-small.png'), linear-gradient(to bottom, #f8f9fa, #e9ecef);
+            --bg-soft: #f8f9fa;
+            --bg-card: linear-gradient(145deg, #e9ecef, #dee2e6);
+            --bg-card-soft: #f8f9fa;
+            --accent: #495057;
+            --accent-soft: rgba(73, 80, 87, 0.4);
+            --accent-2: #6c757d;
+            --text-main: #495057;
+            --text-muted: #6c757d;
+            --border-subtle: rgba(73, 80, 87, 0.3);
+            --pattern-line: rgba(108, 117, 125, 0.2);
+        }
+
+        body[data-theme="noise"] {
+            --bg: url('https://www.transparenttextures.com/patterns/noise.png'), linear-gradient(to bottom, #2c2c2c, #1a1a1a);
+            --bg-soft: #2c2c2c;
+            --bg-card: linear-gradient(145deg, #1a1a1a, #0d0d0d);
+            --bg-card-soft: #2c2c2c;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #aaaaaa;
+            --text-main: #ffffff;
+            --text-muted: #cccccc;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(170, 170, 170, 0.2);
+        }
+
+        body[data-theme="static"] {
+            --bg: url('https://www.transparenttextures.com/patterns/static.png'), linear-gradient(to bottom, #2c2c2c, #1a1a1a);
+            --bg-soft: #2c2c2c;
+            --bg-card: linear-gradient(145deg, #1a1a1a, #0d0d0d);
+            --bg-card-soft: #2c2c2c;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #aaaaaa;
+            --text-main: #ffffff;
+            --text-muted: #cccccc;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(170, 170, 170, 0.2);
+        }
+
+        body[data-theme="glow"] {
+            --bg: radial-gradient(circle at center, #0a0a23, #16213e);
+            --bg-soft: #0a0a23;
+            --bg-card: linear-gradient(145deg, #16213e, #1e3a8a);
+            --bg-card-soft: #0a0a23;
+            --accent: #4cc9f0;
+            --accent-soft: rgba(76, 201, 240, 0.6); /* Higher opacity for glow */
+            --accent-2: #3a86ff;
+            --text-main: #e0e1ff;
+            --text-muted: #a9a9d6;
+            --border-subtle: rgba(76, 201, 240, 0.4); /* Higher opacity */
+            --pattern-line: rgba(58, 134, 255, 0.3); /* Higher opacity */
+        }
+
+        body[data-theme="neon-pulse"] {
+            --bg: radial-gradient(circle at center, #000000, #1a0033);
+            --bg-soft: #000000;
+            --bg-card: linear-gradient(145deg, #4b0082, #000080);
+            --bg-card-soft: #000000;
+            --accent: #00ffff;
+            --accent-soft: rgba(0, 255, 255, 0.6);
+            --accent-2: #ff00ff;
+            --text-main: #ffffff;
+            --text-muted: #cccccc;
+            --border-subtle: rgba(0, 255, 255, 0.4);
+            --pattern-line: rgba(255, 0, 255, 0.3);
+        }
+
+        body[data-theme="vintage-map"] {
+            --bg: url('https://www.transparenttextures.com/patterns/vintage-map.png'), linear-gradient(to bottom, #f5f1e6, #e8e2d1);
+            --bg-soft: #f5f1e6;
+            --bg-card: linear-gradient(145deg, #e8e2d1, #dcd0c0);
+            --bg-card-soft: #f5f1e6;
+            --accent: #8b4513;
+            --accent-soft: rgba(139, 69, 19, 0.4);
+            --accent-2: #cd853f;
+            --text-main: #8b4513;
+            --text-muted: #a0522d;
+            --border-subtle: rgba(139, 69, 19, 0.3);
+            --pattern-line: rgba(205, 133, 63, 0.2);
+        }
+
+        body[data-theme="retro-grid"] {
+            --bg: url('https://www.transparenttextures.com/patterns/retro-grid.png'), linear-gradient(to bottom, #2c2c2c, #1a1a1a);
+            --bg-soft: #2c2c2c;
+            --bg-card: linear-gradient(145deg, #1a1a1a, #0d0d0d);
+            --bg-card-soft: #2c2c2c;
+            --accent: #ff00ff;
+            --accent-soft: rgba(255, 0, 255, 0.4);
+            --accent-2: #00ffff;
+            --text-main: #ffffff;
+            --text-muted: #cccccc;
+            --border-subtle: rgba(255, 0, 255, 0.3);
+            --pattern-line: rgba(0, 255, 255, 0.2);
+        }
+
+        body[data-theme="abstract-art"] {
+            --bg: url('https://www.transparenttextures.com/patterns/abstract-1.png'), linear-gradient(45deg, #ff0000, #00ff00, #0000ff);
+            --bg-soft: #4b0082;
+            --bg-card: linear-gradient(145deg, #9400d3, #4b0082);
+            --bg-card-soft: #4b0082;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #00ff00;
+            --text-main: #ffffff;
+            --text-muted: #e6e6fa;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(0, 255, 0, 0.2);
+        }
+
+        body[data-theme="cosmic-rays"] {
+            --bg: radial-gradient(circle at center, #000000, #1a0033);
+            --bg-soft: #000000;
+            --bg-card: linear-gradient(145deg, #4b0082, #000080);
+            --bg-card-soft: #000000;
+            --accent: #00ffff;
+            --accent-soft: rgba(0, 255, 255, 0.4);
+            --accent-2: #ff00ff;
+            --text-main: #ffffff;
+            --text-muted: #cccccc;
+            --border-subtle: rgba(0, 255, 255, 0.3);
+            --pattern-line: rgba(255, 0, 255, 0.2);
+        }
+
+        body[data-theme="digital-glitch"] {
+            --bg: url('https://www.transparenttextures.com/patterns/digital-glitch.png'), linear-gradient(to bottom, #2c2c2c, #1a1a1a);
+            --bg-soft: #2c2c2c;
+            --bg-card: linear-gradient(145deg, #1a1a1a, #0d0d0d);
+            --bg-card-soft: #2c2c2c;
+            --accent: #ff0000;
+            --accent-soft: rgba(255, 0, 0, 0.4);
+            --accent-2: #00ff00;
+            --text-main: #ffffff;
+            --text-muted: #cccccc;
+            --border-subtle: rgba(255, 0, 0, 0.3);
+            --pattern-line: rgba(0, 255, 0, 0.2);
+        }
+
+        body[data-theme="holographic"] {
+            --bg: radial-gradient(circle at center, #0a0a23, #16213e);
+            --bg-soft: #0a0a23;
+            --bg-card: linear-gradient(145deg, #16213e, #1e3a8a);
+            --bg-card-soft: #0a0a23;
+            --accent: #4cc9f0;
+            --accent-soft: rgba(76, 201, 240, 0.6);
+            --accent-2: #f72585;
+            --text-main: #e0e1ff;
+            --text-muted: #a9a9d6;
+            --border-subtle: rgba(76, 201, 240, 0.4);
+            --pattern-line: rgba(247, 37, 133, 0.2);
+        }
+
+        body[data-theme="matrix-code"] {
+            --bg: url('https://www.transparenttextures.com/patterns/matrix.png'), linear-gradient(to bottom, #000000, #0a0a0a);
+            --bg-soft: #000000;
+            --bg-card: linear-gradient(145deg, #0a0a0a, #1a1a1a);
+            --bg-card-soft: #000000;
+            --accent: #00ff00;
+            --accent-soft: rgba(0, 255, 0, 0.4);
+            --accent-2: #008000;
+            --text-main: #00ff00;
+            --text-muted: #008000;
+            --border-subtle: rgba(0, 255, 0, 0.3);
+            --pattern-line: rgba(0, 128, 0, 0.2);
+        }
+
+        body[data-theme="prism-light"] {
+            --bg: linear-gradient(45deg, #ff0000, #00ff00, #0000ff, #ff0000);
+            --bg-soft: #4b0082;
+            --bg-card: linear-gradient(145deg, #9400d3, #4b0082);
+            --bg-card-soft: #4b0082;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #00ff00;
+            --text-main: #ffffff;
+            --text-muted: #e6e6fa;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(0, 255, 0, 0.2);
+        }
+
+        body[data-theme="aurora-borealis"] {
+            --bg: linear-gradient(90deg, #00c9ff, #92fe9d, #00c9ff, #92fe9d);
+            --bg-soft: #0a0a23;
+            --bg-card: linear-gradient(145deg, #00c9ff, #92fe9d);
+            --bg-card-soft: #0a0a23;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #00ff00;
+            --text-main: #ffffff;
+            --text-muted: #e0f7fa;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(0, 255, 0, 0.2);
+        }
+
+        body[data-theme="fire-and-ice"] {
+            --bg: linear-gradient(45deg, #ff0000, #0000ff);
+            --bg-soft: #8b0000;
+            --bg-card: linear-gradient(145deg, #0000ff, #00bfff);
+            --bg-card-soft: #8b0000;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #ff4500;
+            --text-main: #ffffff;
+            --text-muted: #e0f6ff;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(255, 69, 0, 0.2);
+        }
+
+        body[data-theme="lava-lamp"] {
+            --bg: radial-gradient(circle at center, #ff0000, #ff8c00, #ff0000);
+            --bg-soft: #ff0000;
+            --bg-card: linear-gradient(145deg, #ff8c00, #ff4500);
+            --bg-card-soft: #ff0000;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #ffff00;
+            --text-main: #ffffff;
+            --text-muted: #ffe4e1;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(255, 255, 0, 0.2);
+        }
+
+        body[data-theme="rainbow-swirl"] {
+            --bg: conic-gradient(at center, red, orange, yellow, green, blue, indigo, violet, red);
+            --bg-soft: #4b0082;
+            --bg-card: linear-gradient(145deg, #9400d3, #4b0082);
+            --bg-card-soft: #4b0082;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #00ff00;
+            --text-main: #ffffff;
+            --text-muted: #e6e6fa;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(0, 255, 0, 0.2);
+        }
+
+        body[data-theme="electric-storm"] {
+            --bg: radial-gradient(circle at center, #000000, #0a0a23);
+            --bg-soft: #000000;
+            --bg-card: linear-gradient(145deg, #0a0a23, #1a1a1a);
+            --bg-card-soft: #000000;
+            --accent: #00ffff;
+            --accent-soft: rgba(0, 255, 255, 0.4);
+            --accent-2: #ff00ff;
+            --text-main: #ffffff;
+            --text-muted: #cccccc;
+            --border-subtle: rgba(0, 255, 255, 0.3);
+            --pattern-line: rgba(255, 0, 255, 0.2);
+        }
+
+        body[data-theme="nebula"] {
+            --bg: url('https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1400&q=60'), linear-gradient(to bottom, #4c1d95, #020617);
+            --bg-soft: #3b0764;
+            --bg-card: linear-gradient(145deg, #4c1d95, #020617);
+            --bg-card-soft: #3b0764;
+            --accent: #e9d5ff;
+            --accent-soft: rgba(233, 213, 255, 0.4);
+            --accent-2: #a855f7;
+            --text-main: #f3e8ff;
+            --text-muted: #e9d5ff;
+            --border-subtle: rgba(233, 213, 255, 0.3);
+            --pattern-line: rgba(168, 85, 247, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="forest"] {
+            --bg: url('https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1400&q=60'), linear-gradient(to bottom, #022c22, #020617);
+            --bg-soft: #020617;
+            --bg-card: linear-gradient(145deg, #022c22, #064e3b);
+            --bg-card-soft: #020617;
+            --accent: #bbf7d0;
+            --accent-soft: rgba(134, 239, 172, 0.4);
+            --accent-2: #f97316;
+            --text-main: #ecfdf3;
+            --text-muted: #bbf7d0;
+            --border-subtle: rgba(22, 163, 74, 0.4);
+            --pattern-line: rgba(134, 239, 172, 0.26);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="ocean"] {
+            --bg: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1400&q=60'), linear-gradient(to bottom, #0077be, #00a8cc);
+            --bg-soft: #0077be;
+            --bg-card: linear-gradient(145deg, #00a8cc, #40e0d0);
+            --bg-card-soft: #0077be;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #00ced1;
+            --text-main: #ffffff;
+            --text-muted: #e0ffff;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(0, 206, 209, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="sunset"] {
+            --bg: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1400&q=60'), linear-gradient(to bottom, #ff6b35, #f7931e);
+            --bg-soft: #ff6b35;
+            --bg-card: linear-gradient(145deg, #f7931e, #ffb347);
+            --bg-card-soft: #ff6b35;
+            --accent: #fff8dc;
+            --accent-soft: rgba(255, 248, 220, 0.4);
+            --accent-2: #ffa500;
+            --text-main: #fff8dc;
+            --text-muted: #ffe4b2;
+            --border-subtle: rgba(255, 248, 220, 0.3);
+            --pattern-line: rgba(255, 165, 0, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="mountains"] {
+            --bg: url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1400&q=60'), linear-gradient(to bottom, #2d00f7, #6a0dad);
+            --bg-soft: #2d00f7;
+            --bg-card: linear-gradient(145deg, #6a0dad, #8a2be2);
+            --bg-card-soft: #2d00f7;
+            --accent: #e0b0ff;
+            --accent-soft: rgba(224, 176, 255, 0.4);
+            --accent-2: #da70d6;
+            --text-main: #f8f8ff;
+            --text-muted: #d8bfd8;
+            --border-subtle: rgba(224, 176, 255, 0.25);
+            --pattern-line: rgba(218, 112, 214, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="cityscape"] {
+            --bg: url('https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?auto=format&fit=crop&w=1400&q=60'), linear-gradient(to bottom, #0a0a23, #16213e);
+            --bg-soft: #0a0a23;
+            --bg-card: linear-gradient(145deg, #16213e, #1e3a8a);
+            --bg-card-soft: #0a0a23;
+            --accent: #4cc9f0;
+            --accent-soft: rgba(76, 201, 240, 0.4);
+            --accent-2: #3a86ff;
+            --text-main: #e0e1ff;
+            --text-muted: #a9a9d6;
+            --border-subtle: rgba(76, 201, 240, 0.2);
+            --pattern-line: rgba(58, 134, 255, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="desert"] {
+            --bg: url('https://images.unsplash.com/photo-1509316785289-025f5b8b4c06?auto=format&fit=crop&w=1400&q=60'), linear-gradient(to bottom, #e9dac1, #d2b48c);
+            --bg-soft: #e9dac1;
+            --bg-card: linear-gradient(145deg, #d2b48c, #f4a460);
+            --bg-card-soft: #e9dac1;
+            --accent: #8b4513;
+            --accent-soft: rgba(139, 69, 19, 0.4);
+            --accent-2: #cd853f;
+            --text-main: #8b4513;
+            --text-muted: #a0522d;
+            --border-subtle: rgba(139, 69, 19, 0.3);
+            --pattern-line: rgba(205, 133, 63, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="arctic"] {
+            --bg: url('https://images.unsplash.com/photo-1483921020237-2ff51e8e4b22?auto=format&fit=crop&w=1400&q=60'), linear-gradient(to bottom, #e0f7fa, #b2ebf2);
+            --bg-soft: #e0f7fa;
+            --bg-card: linear-gradient(145deg, #b2ebf2, #80deea);
+            --bg-card-soft: #e0f7fa;
+            --accent: #006064;
+            --accent-soft: rgba(0, 96, 100, 0.4);
+            --accent-2: #00bcd4;
+            --text-main: #006064;
+            --text-muted: #00838f;
+            --border-subtle: rgba(0, 96, 100, 0.3);
+            --pattern-line: rgba(0, 188, 212, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="jungle"] {
+            --bg: url('https://images.unsplash.com/photo-1472214103451-9374bd1c798e?auto=format&fit=crop&w=1400&q=60'), linear-gradient(to bottom, #228b22, #006400);
+            --bg-soft: #228b22;
+            --bg-card: linear-gradient(145deg, #006400, #2e8b57);
+            --bg-card-soft: #228b22;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #32cd32;
+            --text-main: #ffffff;
+            --text-muted: #f0fff0;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(50, 205, 50, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="space"] {
+            --bg: url('https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&w=1400&q=60'), radial-gradient(circle at center, #000000, #0a0a23);
+            --bg-soft: #0a0a23;
+            --bg-card: linear-gradient(145deg, #0f172a, #1a2130);
+            --bg-card-soft: #0a0a23;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #3498db;
+            --text-main: #ffffff;
+            --text-muted: #bdc3c7;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(52, 152, 219, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="underwater-deep"] {
+            --bg: url('https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=1400&q=60'), linear-gradient(to bottom, #0077be, #00a8cc);
+            --bg-soft: #0077be;
+            --bg-card: linear-gradient(145deg, #00a8cc, #40e0d0);
+            --bg-card-soft: #0077be;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #00ced1;
+            --text-main: #ffffff;
+            --text-muted: #e0ffff;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(0, 206, 209, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="volcano"] {
+            --bg: url('https://images.unsplash.com/photo-1588195626282-9c8a91c0d8d8?auto=format&fit=crop&w=1400&q=60'), linear-gradient(to bottom, #ff0000, #ff8c00);
+            --bg-soft: #ff0000;
+            --bg-card: linear-gradient(145deg, #ff8c00, #ff4500);
+            --bg-card-soft: #ff0000;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #ffff00;
+            --text-main: #ffffff;
+            --text-muted: #ffe4e1;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(255, 255, 0, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="aurora-polar"] {
+            --bg: url('https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=1400&q=60'), linear-gradient(90deg, #00c9ff, #92fe9d, #00c9ff, #92fe9d);
+            --bg-soft: #0a0a23;
+            --bg-card: linear-gradient(145deg, #00c9ff, #92fe9d);
+            --bg-card-soft: #0a0a23;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #00ff00;
+            --text-main: #ffffff;
+            --text-muted: #e0f7fa;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(0, 255, 0, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="cosmic-web"] {
+            --bg: url('https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?auto=format&fit=crop&w=1400&q=60'), radial-gradient(circle at center, #000000, #1a0033);
+            --bg-soft: #000000;
+            --bg-card: linear-gradient(145deg, #4b0082, #000080);
+            --bg-card-soft: #000000;
+            --accent: #00ffff;
+            --accent-soft: rgba(0, 255, 255, 0.4);
+            --accent-2: #ff00ff;
+            --text-main: #ffffff;
+            --text-muted: #cccccc;
+            --border-subtle: rgba(0, 255, 255, 0.3);
+            --pattern-line: rgba(255, 0, 255, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="storm"] {
+            --bg: url('https://images.unsplash.com/photo-1505506874110-6a7a69069a08?auto=format&fit=crop&w=1400&q=60'), linear-gradient(to bottom, #2c2c2c, #1a1a1a);
+            --bg-soft: #2c2c2c;
+            --bg-card: linear-gradient(145deg, #1a1a1a, #0d0d0d);
+            --bg-card-soft: #2c2c2c;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #aaaaaa;
+            --text-main: #ffffff;
+            --text-muted: #cccccc;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(170, 170, 170, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="aurora-borealiss"] {
+            --bg: url('https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=1400&q=60'), linear-gradient(90deg, #00c9ff, #92fe9d, #00c9ff, #92fe9d);
+            --bg-soft: #0a0a23;
+            --bg-card: linear-gradient(145deg, #00c9ff, #92fe9d);
+            --bg-card-soft: #0a0a23;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #00ff00;
+            --text-main: #ffffff;
+            --text-muted: #e0f7fa;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(0, 255, 0, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="nebula-blue"] {
+            --bg: url('https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?auto=format&fit=crop&w=1400&q=60'), radial-gradient(circle at center, #000000, #1a0033);
+            --bg-soft: #000000;
+            --bg-card: linear-gradient(145deg, #4b0082, #000080);
+            --bg-card-soft: #000000;
+            --accent: #00ffff;
+            --accent-soft: rgba(0, 255, 255, 0.4);
+            --accent-2: #ff00ff;
+            --text-main: #ffffff;
+            --text-muted: #cccccc;
+            --border-subtle: rgba(0, 255, 255, 0.3);
+            --pattern-line: rgba(255, 0, 255, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="forest-deep"] {
+            --bg: url('https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1400&q=60'), linear-gradient(to bottom, #022c22, #020617);
+            --bg-soft: #020617;
+            --bg-card: linear-gradient(145deg, #022c22, #064e3b);
+            --bg-card-soft: #020617;
+            --accent: #bbf7d0;
+            --accent-soft: rgba(134, 239, 172, 0.4);
+            --accent-2: #f97316;
+            --text-main: #ecfdf3;
+            --text-muted: #bbf7d0;
+            --border-subtle: rgba(22, 163, 74, 0.4);
+            --pattern-line: rgba(134, 239, 172, 0.26);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="ocean-deep"] {
+            --bg: url('https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=1400&q=60'), linear-gradient(to bottom, #0077be, #00a8cc);
+            --bg-soft: #0077be;
+            --bg-card: linear-gradient(145deg, #00a8cc, #40e0d0);
+            --bg-card-soft: #0077be;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #00ced1;
+            --text-main: #ffffff;
+            --text-muted: #e0ffff;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(0, 206, 209, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="sunset-desert"] {
+            --bg: url('https://images.unsplash.com/photo-1509316785289-025f5b8b4c06?auto=format&fit=crop&w=1400&q=60'), linear-gradient(to bottom, #ff6b35, #f7931e);
+            --bg-soft: #ff6b35;
+            --bg-card: linear-gradient(145deg, #f7931e, #ffb347);
+            --bg-card-soft: #ff6b35;
+            --accent: #fff8dc;
+            --accent-soft: rgba(255, 248, 220, 0.4);
+            --accent-2: #ffa500;
+            --text-main: #fff8dc;
+            --text-muted: #ffe4b2;
+            --border-subtle: rgba(255, 248, 220, 0.3);
+            --pattern-line: rgba(255, 165, 0, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="mountains-snow"] {
+            --bg: url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1400&q=60'), linear-gradient(to bottom, #2d00f7, #6a0dad);
+            --bg-soft: #2d00f7;
+            --bg-card: linear-gradient(145deg, #6a0dad, #8a2be2);
+            --bg-card-soft: #2d00f7;
+            --accent: #e0b0ff;
+            --accent-soft: rgba(224, 176, 255, 0.4);
+            --accent-2: #da70d6;
+            --text-main: #f8f8ff;
+            --text-muted: #d8bfd8;
+            --border-subtle: rgba(224, 176, 255, 0.25);
+            --pattern-line: rgba(218, 112, 214, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="cityscape-night"] {
+            --bg: url('https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?auto=format&fit=crop&w=1400&q=60'), linear-gradient(to bottom, #0a0a23, #16213e);
+            --bg-soft: #0a0a23;
+            --bg-card: linear-gradient(145deg, #16213e, #1e3a8a);
+            --bg-card-soft: #0a0a23;
+            --accent: #4cc9f0;
+            --accent-soft: rgba(76, 201, 240, 0.4);
+            --accent-2: #3a86ff;
+            --text-main: #e0e1ff;
+            --text-muted: #a9a9d6;
+            --border-subtle: rgba(76, 201, 240, 0.2);
+            --pattern-line: rgba(58, 134, 255, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="desert-sand"] {
+            --bg: url('https://images.unsplash.com/photo-1509316785289-025f5b8b4c06?auto=format&fit=crop&w=1400&q=60'), linear-gradient(to bottom, #e9dac1, #d2b48c);
+            --bg-soft: #e9dac1;
+            --bg-card: linear-gradient(145deg, #d2b48c, #f4a460);
+            --bg-card-soft: #e9dac1;
+            --accent: #8b4513;
+            --accent-soft: rgba(139, 69, 19, 0.4);
+            --accent-2: #cd853f;
+            --text-main: #8b4513;
+            --text-muted: #a0522d;
+            --border-subtle: rgba(139, 69, 19, 0.3);
+            --pattern-line: rgba(205, 133, 63, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="arctic-ice"] {
+            --bg: url('https://images.unsplash.com/photo-1483921020237-2ff51e8e4b22?auto=format&fit=crop&w=1400&q=60'), linear-gradient(to bottom, #e0f7fa, #b2ebf2);
+            --bg-soft: #e0f7fa;
+            --bg-card: linear-gradient(145deg, #b2ebf2, #80deea);
+            --bg-card-soft: #e0f7fa;
+            --accent: #006064;
+            --accent-soft: rgba(0, 96, 100, 0.4);
+            --accent-2: #00bcd4;
+            --text-main: #006064;
+            --text-muted: #00838f;
+            --border-subtle: rgba(0, 96, 100, 0.3);
+            --pattern-line: rgba(0, 188, 212, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="jungle-rain"] {
+            --bg: url('https://images.unsplash.com/photo-1472214103451-9374bd1c798e?auto=format&fit=crop&w=1400&q=60'), linear-gradient(to bottom, #228b22, #006400);
+            --bg-soft: #228b22;
+            --bg-card: linear-gradient(145deg, #006400, #2e8b57);
+            --bg-card-soft: #228b22;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #32cd32;
+            --text-main: #ffffff;
+            --text-muted: #f0fff0;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(50, 205, 50, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="space-stars"] {
+            --bg: url('https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&w=1400&q=60'), radial-gradient(circle at center, #000000, #0a0a23);
+            --bg-soft: #0a0a23;
+            --bg-card: linear-gradient(145deg, #0f172a, #1a2130);
+            --bg-card-soft: #0a0a23;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #3498db;
+            --text-main: #ffffff;
+            --text-muted: #bdc3c7;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(52, 152, 219, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="underwater-coral"] {
+            --bg: url('https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=1400&q=60'), linear-gradient(to bottom, #0077be, #00a8cc);
+            --bg-soft: #0077be;
+            --bg-card: linear-gradient(145deg, #00a8cc, #40e0d0);
+            --bg-card-soft: #0077be;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #00ced1;
+            --text-main: #ffffff;
+            --text-muted: #e0ffff;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(0, 206, 209, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="volcano-erupt"] {
+            --bg: url('https://images.unsplash.com/photo-1588195626282-9c8a91c0d8d8?auto=format&fit=crop&w=1400&q=60'), linear-gradient(to bottom, #ff0000, #ff8c00);
+            --bg-soft: #ff0000;
+            --bg-card: linear-gradient(145deg, #ff8c00, #ff4500);
+            --bg-card-soft: #ff0000;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #ffff00;
+            --text-main: #ffffff;
+            --text-muted: #ffe4e1;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(255, 255, 0, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="aurora-northern"] {
+            --bg: url('https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=1400&q=60'), linear-gradient(90deg, #00c9ff, #92fe9d, #00c9ff, #92fe9d);
+            --bg-soft: #0a0a23;
+            --bg-card: linear-gradient(145deg, #00c9ff, #92fe9d);
+            --bg-card-soft: #0a0a23;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #00ff00;
+            --text-main: #ffffff;
+            --text-muted: #e0f7fa;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(0, 255, 0, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="cosmic-nebula"] {
+            --bg: url('https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?auto=format&fit=crop&w=1400&q=60'), radial-gradient(circle at center, #000000, #1a0033);
+            --bg-soft: #000000;
+            --bg-card: linear-gradient(145deg, #4b0082, #000080);
+            --bg-card-soft: #000000;
+            --accent: #00ffff;
+            --accent-soft: rgba(0, 255, 255, 0.4);
+            --accent-2: #ff00ff;
+            --text-main: #ffffff;
+            --text-muted: #cccccc;
+            --border-subtle: rgba(0, 255, 255, 0.3);
+            --pattern-line: rgba(255, 0, 255, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="storm-clouds"] {
+            --bg: url('https://images.unsplash.com/photo-1505506874110-6a7a69069a08?auto=format&fit=crop&w=1400&q=60'), linear-gradient(to bottom, #2c2c2c, #1a1a1a);
+            --bg-soft: #2c2c2c;
+            --bg-card: linear-gradient(145deg, #1a1a1a, #0d0d0d);
+            --bg-card-soft: #2c2c2c;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #aaaaaa;
+            --text-main: #ffffff;
+            --text-muted: #cccccc;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(170, 170, 170, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="aurora-borealisss"] {
+            --bg: url('https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=1400&q=60'), linear-gradient(90deg, #00c9ff, #92fe9d, #00c9ff, #92fe9d);
+            --bg-soft: #0a0a23;
+            --bg-card: linear-gradient(145deg, #00c9ff, #92fe9d);
+            --bg-card-soft: #0a0a23;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #00ff00;
+            --text-main: #ffffff;
+            --text-muted: #e0f7fa;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(0, 255, 0, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="nebula-purple"] {
+            --bg: url('https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?auto=format&fit=crop&w=1400&q=60'), radial-gradient(circle at center, #000000, #1a0033);
+            --bg-soft: #000000;
+            --bg-card: linear-gradient(145deg, #4b0082, #000080);
+            --bg-card-soft: #000000;
+            --accent: #00ffff;
+            --accent-soft: rgba(0, 255, 255, 0.4);
+            --accent-2: #ff00ff;
+            --text-main: #ffffff;
+            --text-muted: #cccccc;
+            --border-subtle: rgba(0, 255, 255, 0.3);
+            --pattern-line: rgba(255, 0, 255, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="forest-pine"] {
+            --bg: url('https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1400&q=60'), linear-gradient(to bottom, #022c22, #020617);
+            --bg-soft: #020617;
+            --bg-card: linear-gradient(145deg, #022c22, #064e3b);
+            --bg-card-soft: #020617;
+            --accent: #bbf7d0;
+            --accent-soft: rgba(134, 239, 172, 0.4);
+            --accent-2: #f97316;
+            --text-main: #ecfdf3;
+            --text-muted: #bbf7d0;
+            --border-subtle: rgba(22, 163, 74, 0.4);
+            --pattern-line: rgba(134, 239, 172, 0.26);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="ocean-waves"] {
+            --bg: url('https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=1400&q=60'), linear-gradient(to bottom, #0077be, #00a8cc);
+            --bg-soft: #0077be;
+            --bg-card: linear-gradient(145deg, #00a8cc, #40e0d0);
+            --bg-card-soft: #0077be;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #00ced1;
+            --text-main: #ffffff;
+            --text-muted: #e0ffff;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(0, 206, 209, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="sunset-horizon"] {
+            --bg: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1400&q=60'), linear-gradient(to bottom, #ff6b35, #f7931e);
+            --bg-soft: #ff6b35;
+            --bg-card: linear-gradient(145deg, #f7931e, #ffb347);
+            --bg-card-soft: #ff6b35;
+            --accent: #fff8dc;
+            --accent-soft: rgba(255, 248, 220, 0.4);
+            --accent-2: #ffa500;
+            --text-main: #fff8dc;
+            --text-muted: #ffe4b2;
+            --border-subtle: rgba(255, 248, 220, 0.3);
+            --pattern-line: rgba(255, 165, 0, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="mountains-peaks"] {
+            --bg: url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1400&q=60'), linear-gradient(to bottom, #2d00f7, #6a0dad);
+            --bg-soft: #2d00f7;
+            --bg-card: linear-gradient(145deg, #6a0dad, #8a2be2);
+            --bg-card-soft: #2d00f7;
+            --accent: #e0b0ff;
+            --accent-soft: rgba(224, 176, 255, 0.4);
+            --accent-2: #da70d6;
+            --text-main: #f8f8ff;
+            --text-muted: #d8bfd8;
+            --border-subtle: rgba(224, 176, 255, 0.25);
+            --pattern-line: rgba(218, 112, 214, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="cityscape-lights"] {
+            --bg: url('https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?auto=format&fit=crop&w=1400&q=60'), linear-gradient(to bottom, #0a0a23, #16213e);
+            --bg-soft: #0a0a23;
+            --bg-card: linear-gradient(145deg, #16213e, #1e3a8a);
+            --bg-card-soft: #0a0a23;
+            --accent: #4cc9f0;
+            --accent-soft: rgba(76, 201, 240, 0.4);
+            --accent-2: #3a86ff;
+            --text-main: #e0e1ff;
+            --text-muted: #a9a9d6;
+            --border-subtle: rgba(76, 201, 240, 0.2);
+            --pattern-line: rgba(58, 134, 255, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="desert-dunes"] {
+            --bg: url('https://images.unsplash.com/photo-1509316785289-025f5b8b4c06?auto=format&fit=crop&w=1400&q=60'), linear-gradient(to bottom, #e9dac1, #d2b48c);
+            --bg-soft: #e9dac1;
+            --bg-card: linear-gradient(145deg, #d2b48c, #f4a460);
+            --bg-card-soft: #e9dac1;
+            --accent: #8b4513;
+            --accent-soft: rgba(139, 69, 19, 0.4);
+            --accent-2: #cd853f;
+            --text-main: #8b4513;
+            --text-muted: #a0522d;
+            --border-subtle: rgba(139, 69, 19, 0.3);
+            --pattern-line: rgba(205, 133, 63, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="arctic-tundra"] {
+            --bg: url('https://images.unsplash.com/photo-1483921020237-2ff51e8e4b22?auto=format&fit=crop&w=1400&q=60'), linear-gradient(to bottom, #e0f7fa, #b2ebf2);
+            --bg-soft: #e0f7fa;
+            --bg-card: linear-gradient(145deg, #b2ebf2, #80deea);
+            --bg-card-soft: #e0f7fa;
+            --accent: #006064;
+            --accent-soft: rgba(0, 96, 100, 0.4);
+            --accent-2: #00bcd4;
+            --text-main: #006064;
+            --text-muted: #00838f;
+            --border-subtle: rgba(0, 96, 100, 0.3);
+            --pattern-line: rgba(0, 188, 212, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="jungle-vine"] {
+            --bg: url('https://images.unsplash.com/photo-1472214103451-9374bd1c798e?auto=format&fit=crop&w=1400&q=60'), linear-gradient(to bottom, #228b22, #006400);
+            --bg-soft: #228b22;
+            --bg-card: linear-gradient(145deg, #006400, #2e8b57);
+            --bg-card-soft: #228b22;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #32cd32;
+            --text-main: #ffffff;
+            --text-muted: #f0fff0;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(50, 205, 50, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="space-galaxy"] {
+            --bg: url('https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&w=1400&q=60'), radial-gradient(circle at center, #000000, #0a0a23);
+            --bg-soft: #0a0a23;
+            --bg-card: linear-gradient(145deg, #0f172a, #1a2130);
+            --bg-card-soft: #0a0a23;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #3498db;
+            --text-main: #ffffff;
+            --text-muted: #bdc3c7;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(52, 152, 219, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="underwater-tide"] {
+            --bg: url('https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=1400&q=60'), linear-gradient(to bottom, #0077be, #00a8cc);
+            --bg-soft: #0077be;
+            --bg-card: linear-gradient(145deg, #00a8cc, #40e0d0);
+            --bg-card-soft: #0077be;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #00ced1;
+            --text-main: #ffffff;
+            --text-muted: #e0ffff;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(0, 206, 209, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="volcano-magma"] {
+            --bg: url('https://images.unsplash.com/photo-1588195626282-9c8a91c0d8d8?auto=format&fit=crop&w=1400&q=60'), linear-gradient(to bottom, #ff0000, #ff8c00);
+            --bg-soft: #ff0000;
+            --bg-card: linear-gradient(145deg, #ff8c00, #ff4500);
+            --bg-card-soft: #ff0000;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #ffff00;
+            --text-main: #ffffff;
+            --text-muted: #ffe4e1;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(255, 255, 0, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="aurora-lights"] {
+            --bg: url('https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=1400&q=60'), linear-gradient(90deg, #00c9ff, #92fe9d, #00c9ff, #92fe9d);
+            --bg-soft: #0a0a23;
+            --bg-card: linear-gradient(145deg, #00c9ff, #92fe9d);
+            --bg-card-soft: #0a0a23;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #00ff00;
+            --text-main: #ffffff;
+            --text-muted: #e0f7fa;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(0, 255, 0, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="cosmic-dust"] {
+            --bg: url('https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?auto=format&fit=crop&w=1400&q=60'), radial-gradient(circle at center, #000000, #1a0033);
+            --bg-soft: #000000;
+            --bg-card: linear-gradient(145deg, #4b0082, #000080);
+            --bg-card-soft: #000000;
+            --accent: #00ffff;
+            --accent-soft: rgba(0, 255, 255, 0.4);
+            --accent-2: #ff00ff;
+            --text-main: #ffffff;
+            --text-muted: #cccccc;
+            --border-subtle: rgba(0, 255, 255, 0.3);
+            --pattern-line: rgba(255, 0, 255, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="storm-front"] {
+            --bg: url('https://images.unsplash.com/photo-1505506874110-6a7a69069a08?auto=format&fit=crop&w=1400&q=60'), linear-gradient(to bottom, #2c2c2c, #1a1a1a);
+            --bg-soft: #2c2c2c;
+            --bg-card: linear-gradient(145deg, #1a1a1a, #0d0d0d);
+            --bg-card-soft: #2c2c2c;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #aaaaaa;
+            --text-main: #ffffff;
+            --text-muted: #cccccc;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(170, 170, 170, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="aurora-borealiss"] {
+            --bg: url('https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=1400&q=60'), linear-gradient(90deg, #00c9ff, #92fe9d, #00c9ff, #92fe9d);
+            --bg-soft: #0a0a23;
+            --bg-card: linear-gradient(145deg, #00c9ff, #92fe9d);
+            --bg-card-soft: #0a0a23;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #00ff00;
+            --text-main: #ffffff;
+            --text-muted: #e0f7fa;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(0, 255, 0, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="nebula-red"] {
+            --bg: url('https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?auto=format&fit=crop&w=1400&q=60'), radial-gradient(circle at center, #000000, #1a0033);
+            --bg-soft: #000000;
+            --bg-card: linear-gradient(145deg, #4b0082, #000080);
+            --bg-card-soft: #000000;
+            --accent: #00ffff;
+            --accent-soft: rgba(0, 255, 255, 0.4);
+            --accent-2: #ff00ff;
+            --text-main: #ffffff;
+            --text-muted: #cccccc;
+            --border-subtle: rgba(0, 255, 255, 0.3);
+            --pattern-line: rgba(255, 0, 255, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="forest-oak"] {
+            --bg: url('https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1400&q=60'), linear-gradient(to bottom, #022c22, #020617);
+            --bg-soft: #020617;
+            --bg-card: linear-gradient(145deg, #022c22, #064e3b);
+            --bg-card-soft: #020617;
+            --accent: #bbf7d0;
+            --accent-soft: rgba(134, 239, 172, 0.4);
+            --accent-2: #f97316;
+            --text-main: #ecfdf3;
+            --text-muted: #bbf7d0;
+            --border-subtle: rgba(22, 163, 74, 0.4);
+            --pattern-line: rgba(134, 239, 172, 0.26);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="ocean-depths"] {
+            --bg: url('https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=1400&q=60'), linear-gradient(to bottom, #0077be, #00a8cc);
+            --bg-soft: #0077be;
+            --bg-card: linear-gradient(145deg, #00a8cc, #40e0d0);
+            --bg-card-soft: #0077be;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #00ced1;
+            --text-main: #ffffff;
+            --text-muted: #e0ffff;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(0, 206, 209, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="sunset-valley"] {
+            --bg: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1400&q=60'), linear-gradient(to bottom, #ff6b35, #f7931e);
+            --bg-soft: #ff6b35;
+            --bg-card: linear-gradient(145deg, #f7931e, #ffb347);
+            --bg-card-soft: #ff6b35;
+            --accent: #fff8dc;
+            --accent-soft: rgba(255, 248, 220, 0.4);
+            --accent-2: #ffa500;
+            --text-main: #fff8dc;
+            --text-muted: #ffe4b2;
+            --border-subtle: rgba(255, 248, 220, 0.3);
+            --pattern-line: rgba(255, 165, 0, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="mountains-everest"] {
+            --bg: url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1400&q=60'), linear-gradient(to bottom, #2d00f7, #6a0dad);
+            --bg-soft: #2d00f7;
+            --bg-card: linear-gradient(145deg, #6a0dad, #8a2be2);
+            --bg-card-soft: #2d00f7;
+            --accent: #e0b0ff;
+            --accent-soft: rgba(224, 176, 255, 0.4);
+            --accent-2: #da70d6;
+            --text-main: #f8f8ff;
+            --text-muted: #d8bfd8;
+            --border-subtle: rgba(224, 176, 255, 0.25);
+            --pattern-line: rgba(218, 112, 214, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="cityscape-skyline"] {
+            --bg: url('https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?auto=format&fit=crop&w=1400&q=60'), linear-gradient(to bottom, #0a0a23, #16213e);
+            --bg-soft: #0a0a23;
+            --bg-card: linear-gradient(145deg, #16213e, #1e3a8a);
+            --bg-card-soft: #0a0a23;
+            --accent: #4cc9f0;
+            --accent-soft: rgba(76, 201, 240, 0.4);
+            --accent-2: #3a86ff;
+            --text-main: #e0e1ff;
+            --text-muted: #a9a9d6;
+            --border-subtle: rgba(76, 201, 240, 0.2);
+            --pattern-line: rgba(58, 134, 255, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="desert-mirage"] {
+            --bg: url('https://images.unsplash.com/photo-1509316785289-025f5b8b4c06?auto=format&fit=crop&w=1400&q=60'), linear-gradient(to bottom, #e9dac1, #d2b48c);
+            --bg-soft: #e9dac1;
+            --bg-card: linear-gradient(145deg, #d2b48c, #f4a460);
+            --bg-card-soft: #e9dac1;
+            --accent: #8b4513;
+            --accent-soft: rgba(139, 69, 19, 0.4);
+            --accent-2: #cd853f;
+            --text-main: #8b4513;
+            --text-muted: #a0522d;
+            --border-subtle: rgba(139, 69, 19, 0.3);
+            --pattern-line: rgba(205, 133, 63, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="arctic-north"] {
+            --bg: url('https://images.unsplash.com/photo-1483921020237-2ff51e8e4b22?auto=format&fit=crop&w=1400&q=60'), linear-gradient(to bottom, #e0f7fa, #b2ebf2);
+            --bg-soft: #e0f7fa;
+            --bg-card: linear-gradient(145deg, #b2ebf2, #80deea);
+            --bg-card-soft: #e0f7fa;
+            --accent: #006064;
+            --accent-soft: rgba(0, 96, 100, 0.4);
+            --accent-2: #00bcd4;
+            --text-main: #006064;
+            --text-muted: #00838f;
+            --border-subtle: rgba(0, 96, 100, 0.3);
+            --pattern-line: rgba(0, 188, 212, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="jungle-animals"] {
+            --bg: url('https://images.unsplash.com/photo-1472214103451-9374bd1c798e?auto=format&fit=crop&w=1400&q=60'), linear-gradient(to bottom, #228b22, #006400);
+            --bg-soft: #228b22;
+            --bg-card: linear-gradient(145deg, #006400, #2e8b57);
+            --bg-card-soft: #228b22;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #32cd32;
+            --text-main: #ffffff;
+            --text-muted: #f0fff0;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(50, 205, 50, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="space-rocket"] {
+            --bg: url('https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&w=1400&q=60'), radial-gradient(circle at center, #000000, #0a0a23);
+            --bg-soft: #0a0a23;
+            --bg-card: linear-gradient(145deg, #0f172a, #1a2130);
+            --bg-card-soft: #0a0a23;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #3498db;
+            --text-main: #ffffff;
+            --text-muted: #bdc3c7;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(52, 152, 219, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="underwater-ship"] {
+            --bg: url('https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=1400&q=60'), linear-gradient(to bottom, #0077be, #00a8cc);
+            --bg-soft: #0077be;
+            --bg-card: linear-gradient(145deg, #00a8cc, #40e0d0);
+            --bg-card-soft: #0077be;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #00ced1;
+            --text-main: #ffffff;
+            --text-muted: #e0ffff;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(0, 206, 209, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="volcano-fire"] {
+            --bg: url('https://images.unsplash.com/photo-1588195626282-9c8a91c0d8d8?auto=format&fit=crop&w=1400&q=60'), linear-gradient(to bottom, #ff0000, #ff8c00);
+            --bg-soft: #ff0000;
+            --bg-card: linear-gradient(145deg, #ff8c00, #ff4500);
+            --bg-card-soft: #ff0000;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #ffff00;
+            --text-main: #ffffff;
+            --text-muted: #ffe4e1;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(255, 255, 0, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="aurora-sky"] {
+            --bg: url('https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=1400&q=60'), linear-gradient(90deg, #00c9ff, #92fe9d, #00c9ff, #92fe9d);
+            --bg-soft: #0a0a23;
+            --bg-card: linear-gradient(145deg, #00c9ff, #92fe9d);
+            --bg-card-soft: #0a0a23;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #00ff00;
+            --text-main: #ffffff;
+            --text-muted: #e0f7fa;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(0, 255, 0, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="cosmic-star"] {
+            --bg: url('https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?auto=format&fit=crop&w=1400&q=60'), radial-gradient(circle at center, #000000, #1a0033);
+            --bg-soft: #000000;
+            --bg-card: linear-gradient(145deg, #4b0082, #000080);
+            --bg-card-soft: #000000;
+            --accent: #00ffff;
+            --accent-soft: rgba(0, 255, 255, 0.4);
+            --accent-2: #ff00ff;
+            --text-main: #ffffff;
+            --text-muted: #cccccc;
+            --border-subtle: rgba(0, 255, 255, 0.3);
+            --pattern-line: rgba(255, 0, 255, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="storm-wind"] {
+            --bg: url('https://images.unsplash.com/photo-1505506874110-6a7a69069a08?auto=format&fit=crop&w=1400&q=60'), linear-gradient(to bottom, #2c2c2c, #1a1a1a);
+            --bg-soft: #2c2c2c;
+            --bg-card: linear-gradient(145deg, #1a1a1a, #0d0d0d);
+            --bg-card-soft: #2c2c2c;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #aaaaaa;
+            --text-main: #ffffff;
+            --text-muted: #cccccc;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(170, 170, 170, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="aurora-borealissss"] {
+            --bg: url('https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=1400&q=60'), linear-gradient(90deg, #00c9ff, #92fe9d, #00c9ff, #92fe9d);
+            --bg-soft: #0a0a23;
+            --bg-card: linear-gradient(145deg, #00c9ff, #92fe9d);
+            --bg-card-soft: #0a0a23;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #00ff00;
+            --text-main: #ffffff;
+            --text-muted: #e0f7fa;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(0, 255, 0, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="nebula-green"] {
+            --bg: url('https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?auto=format&fit=crop&w=1400&q=60'), radial-gradient(circle at center, #000000, #1a0033);
+            --bg-soft: #000000;
+            --bg-card: linear-gradient(145deg, #4b0082, #000080);
+            --bg-card-soft: #000000;
+            --accent: #00ffff;
+            --accent-soft: rgba(0, 255, 255, 0.4);
+            --accent-2: #ff00ff;
+            --text-main: #ffffff;
+            --text-muted: #cccccc;
+            --border-subtle: rgba(0, 255, 255, 0.3);
+            --pattern-line: rgba(255, 0, 255, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="forest-palm"] {
+            --bg: url('https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1400&q=60'), linear-gradient(to bottom, #022c22, #020617);
+            --bg-soft: #020617;
+            --bg-card: linear-gradient(145deg, #022c22, #064e3b);
+            --bg-card-soft: #020617;
+            --accent: #bbf7d0;
+            --accent-soft: rgba(134, 239, 172, 0.4);
+            --accent-2: #f97316;
+            --text-main: #ecfdf3;
+            --text-muted: #bbf7d0;
+            --border-subtle: rgba(22, 163, 74, 0.4);
+            --pattern-line: rgba(134, 239, 172, 0.26);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="ocean-reef"] {
+            --bg: url('https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=1400&q=60'), linear-gradient(to bottom, #0077be, #00a8cc);
+            --bg-soft: #0077be;
+            --bg-card: linear-gradient(145deg, #00a8cc, #40e0d0);
+            --bg-card-soft: #0077be;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #00ced1;
+            --text-main: #ffffff;
+            --text-muted: #e0ffff;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(0, 206, 209, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="sunset-beach"] {
+            --bg: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1400&q=60'), linear-gradient(to bottom, #ff6b35, #f7931e);
+            --bg-soft: #ff6b35;
+            --bg-card: linear-gradient(145deg, #f7931e, #ffb347);
+            --bg-card-soft: #ff6b35;
+            --accent: #fff8dc;
+            --accent-soft: rgba(255, 248, 220, 0.4);
+            --accent-2: #ffa500;
+            --text-main: #fff8dc;
+            --text-muted: #ffe4b2;
+            --border-subtle: rgba(255, 248, 220, 0.3);
+            --pattern-line: rgba(255, 165, 0, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="mountains-ski"] {
+            --bg: url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1400&q=60'), linear-gradient(to bottom, #2d00f7, #6a0dad);
+            --bg-soft: #2d00f7;
+            --bg-card: linear-gradient(145deg, #6a0dad, #8a2be2);
+            --bg-card-soft: #2d00f7;
+            --accent: #e0b0ff;
+            --accent-soft: rgba(224, 176, 255, 0.4);
+            --accent-2: #da70d6;
+            --text-main: #f8f8ff;
+            --text-muted: #d8bfd8;
+            --border-subtle: rgba(224, 176, 255, 0.25);
+            --pattern-line: rgba(218, 112, 214, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="cityscape-downtown"] {
+            --bg: url('https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?auto=format&fit=crop&w=1400&q=60'), linear-gradient(to bottom, #0a0a23, #16213e);
+            --bg-soft: #0a0a23;
+            --bg-card: linear-gradient(145deg, #16213e, #1e3a8a);
+            --bg-card-soft: #0a0a23;
+            --accent: #4cc9f0;
+            --accent-soft: rgba(76, 201, 240, 0.4);
+            --accent-2: #3a86ff;
+            --text-main: #e0e1ff;
+            --text-muted: #a9a9d6;
+            --border-subtle: rgba(76, 201, 240, 0.2);
+            --pattern-line: rgba(58, 134, 255, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="desert-road"] {
+            --bg: url('https://images.unsplash.com/photo-1509316785289-025f5b8b4c06?auto=format&fit=crop&w=1400&q=60'), linear-gradient(to bottom, #e9dac1, #d2b48c);
+            --bg-soft: #e9dac1;
+            --bg-card: linear-gradient(145deg, #d2b48c, #f4a460);
+            --bg-card-soft: #e9dac1;
+            --accent: #8b4513;
+            --accent-soft: rgba(139, 69, 19, 0.4);
+            --accent-2: #cd853f;
+            --text-main: #8b4513;
+            --text-muted: #a0522d;
+            --border-subtle: rgba(139, 69, 19, 0.3);
+            --pattern-line: rgba(205, 133, 63, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="arctic-northpole"] {
+            --bg: url('https://images.unsplash.com/photo-1483921020237-2ff51e8e4b22?auto=format&fit=crop&w=1400&q=60'), linear-gradient(to bottom, #e0f7fa, #b2ebf2);
+            --bg-soft: #e0f7fa;
+            --bg-card: linear-gradient(145deg, #b2ebf2, #80deea);
+            --bg-card-soft: #e0f7fa;
+            --accent: #006064;
+            --accent-soft: rgba(0, 96, 100, 0.4);
+            --accent-2: #00bcd4;
+            --text-main: #006064;
+            --text-muted: #00838f;
+            --border-subtle: rgba(0, 96, 100, 0.3);
+            --pattern-line: rgba(0, 188, 212, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="jungle-tree"] {
+            --bg: url('https://images.unsplash.com/photo-1472214103451-9374bd1c798e?auto=format&fit=crop&w=1400&q=60'), linear-gradient(to bottom, #228b22, #006400);
+            --bg-soft: #228b22;
+            --bg-card: linear-gradient(145deg, #006400, #2e8b57);
+            --bg-card-soft: #228b22;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #32cd32;
+            --text-main: #ffffff;
+            --text-muted: #f0fff0;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(50, 205, 50, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="space-planet"] {
+            --bg: url('https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&w=1400&q=60'), radial-gradient(circle at center, #000000, #0a0a23);
+            --bg-soft: #0a0a23;
+            --bg-card: linear-gradient(145deg, #0f172a, #1a2130);
+            --bg-card-soft: #0a0a23;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #3498db;
+            --text-main: #ffffff;
+            --text-muted: #bdc3c7;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(52, 152, 219, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="underwater-mermaid"] {
+            --bg: url('https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=1400&q=60'), linear-gradient(to bottom, #0077be, #00a8cc);
+            --bg-soft: #0077be;
+            --bg-card: linear-gradient(145deg, #00a8cc, #40e0d0);
+            --bg-card-soft: #0077be;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #00ced1;
+            --text-main: #ffffff;
+            --text-muted: #e0ffff;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(0, 206, 209, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="volcano-ash"] {
+            --bg: url('https://images.unsplash.com/photo-1588195626282-9c8a91c0d8d8?auto=format&fit=crop&w=1400&q=60'), linear-gradient(to bottom, #ff0000, #ff8c00);
+            --bg-soft: #ff0000;
+            --bg-card: linear-gradient(145deg, #ff8c00, #ff4500);
+            --bg-card-soft: #ff0000;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #ffff00;
+            --text-main: #ffffff;
+            --text-muted: #ffe4e1;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(255, 255, 0, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="aurora-ice"] {
+            --bg: url('https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=1400&q=60'), linear-gradient(90deg, #00c9ff, #92fe9d, #00c9ff, #92fe9d);
+            --bg-soft: #0a0a23;
+            --bg-card: linear-gradient(145deg, #00c9ff, #92fe9d);
+            --bg-card-soft: #0a0a23;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #00ff00;
+            --text-main: #ffffff;
+            --text-muted: #e0f7fa;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(0, 255, 0, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="cosmic-void"] {
+            --bg: url('https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?auto=format&fit=crop&w=1400&q=60'), radial-gradient(circle at center, #000000, #1a0033);
+            --bg-soft: #000000;
+            --bg-card: linear-gradient(145deg, #4b0082, #000080);
+            --bg-card-soft: #000000;
+            --accent: #00ffff;
+            --accent-soft: rgba(0, 255, 255, 0.4);
+            --accent-2: #ff00ff;
+            --text-main: #ffffff;
+            --text-muted: #cccccc;
+            --border-subtle: rgba(0, 255, 255, 0.3);
+            --pattern-line: rgba(255, 0, 255, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        body[data-theme="storm-lightning"] {
+            --bg: url('https://images.unsplash.com/photo-1505506874110-6a7a69069a08?auto=format&fit=crop&w=1400&q=60'), linear-gradient(to bottom, #2c2c2c, #1a1a1a);
+            --bg-soft: #2c2c2c;
+            --bg-card: linear-gradient(145deg, #1a1a1a, #0d0d0d);
+            --bg-card-soft: #2c2c2c;
+            --accent: #ffffff;
+            --accent-soft: rgba(255, 255, 255, 0.4);
+            --accent-2: #aaaaaa;
+            --text-main: #ffffff;
+            --text-muted: #cccccc;
+            --border-subtle: rgba(255, 255, 255, 0.3);
+            --pattern-line: rgba(170, 170, 170, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+    </style>
+</head>
+<body data-theme="default">
+    <div class="bg-gradient"></div>
+    <div class="bg-pattern"></div>
+    <div class="app">
+        <!-- LEFT SIDEBAR NAV -->
+        <aside class="side-nav">
+            <div class="side-nav-header">
+                <div class="side-logo-circle">R</div>
+                <div class="side-logo-text">RobbGameSite1212</div>
+            </div>
+            <div class="side-section-label">Lounge</div>
+            <div class="side-nav-list">
+                <button class="side-nav-item active" data-tab="games"><span class="icon">🎮</span><span>Games</span></button>
+                <button class="side-nav-item" data-tab="sound-board"><span class="icon">🎵</span><span>Sound Board</span></button>
+            </div>
+            <div class="side-section-label">Settings</div>
+            <div class="side-nav-list">
+                <button class="side-nav-item" data-tab="settings"><span class="icon">⚙️</span><span>Settings</span></button>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="main-content">
+            <!-- GAMES PANEL -->
+            <div class="tab-panel active" data-tab-panel="games">
+                <div class="welcome-block">
+                    <div class="welcome-title"><span class="welcome-highlight">🎮</span> RobbGameSite1212</div>
+                    <div class="welcome-sub">Your ultimate destination for free online games!</div>
+                </div>
+
+                <!-- SEARCH BAR -->
+                <div class="search-area">
+                    <input id="game-search" class="search-input" type="text" placeholder="Search for games...">
+                    <span class="search-icon">🔍</span>
+                </div>
+
+                <!-- GAME LIST -->
+                <div class="game-list" id="game-list">
+                    <!-- Game cards will be dynamically inserted here -->
+                </div>
+            </div>
+
+            <!-- SETTINGS PANEL -->
+            <div class="tab-panel" data-tab-panel="settings">
+                <div class="settings-panel">
+                    <div class="settings-group">
+                        <h3>Appearance</h3>
+                        <div class="form-row">
+                            <div class="form-field">
+                                <label for="theme-select">Color Theme</label>
+                                <select id="theme-select">
+                                    <option value="default">Default</option>
+                                    <option value="candy-pop">Candy Pop</option>
+                                    <option value="void">Void</option>
+                                    <option value="pastel-dream">Pastel Dream</option>
+                                    <option value="dusk-horizon">Dusk Horizon</option>
+                                    <option value="arcade-glow">Arcade Glow</option>
+                                    <option value="solar-flare">Solar Flare</option>
+                                    <option value="frost-byte">Frost Byte</option>
+                                    <option value="terminal-green">Terminal Green</option>
+                                    <option value="lavender-mist">Lavender Mist</option>
+                                    <option value="neon-sunset">Neon Sunset</option>
+                                    <option value="forest-cabin">Forest Cabin</option>
+                                    <option value="midnight-blue">Midnight Blue</option>
+                                    <option value="cosmic-purple">Cosmic Purple</option>
+                                    <option value="sunset-orange">Sunset Orange</option>
+                                    <option value="ocean-blue">Ocean Blue</option>
+                                    <option value="emerald-green">Emerald Green</option>
+                                    <option value="crimson-red">Crimson Red</option>
+                                    <option value="gold-amber">Gold Amber</option>
+                                    <option value="silver-gray">Silver Gray</option>
+                                    <option value="royal-indigo">Royal Indigo</option>
+                                    <option value="hot-pink">Hot Pink</option>
+                                    <option value="teal-turquoise">Teal Turquoise</option>
+                                    <option value="chocolate-brown">Chocolate Brown</option>
+                                    <option value="slate-blue">Slate Blue</option>
+                                    <option value="coral-salmon">Coral Salmon</option>
+                                    <option value="mint-cream">Mint Cream</option>
+                                    <option value="strawberry-lemonade">Strawberry Lemonade</option>
+                                    <option value="arctic-aurora">Arctic Aurora</option>
+                                    <option value="neon-circuit">Neon Circuit</option>
+                                    <option value="desert-sand">Desert Sand</option>
+                                    <option value="lavender-field">Lavender Field</option>
+                                    <option value="mango-tango">Mango Tango</option>
+                                    <option value="peacock-feather">Peacock Feather</option>
+                                    <option value="bubblegum-pink">Bubblegum Pink</option>
+                                    <option value="ice-blue">Ice Blue</option>
+                                    <option value="fire-engine-red">Fire Engine Red</option>
+                                    <option value="leafy-green">Leafy Green</option>
+                                    <option value="violet-vogue">Violet Vogue</option>
+                                    <option value="amber-wave">Amber Wave</option>
+                                    <option value="charcoal-black">Charcoal Black</option>
+                                    <option value="tropical-teal">Tropical Teal</option>
+                                    <option value="raspberry-ripple">Raspberry Ripple</option>
+                                    <option value="sky-high">Sky High</option>
+                                    <option value="cotton-candy">Cotton Candy</option>
+                                    <option value="electric-blue">Electric Blue</option>
+                                    <option value="ruby-red">Ruby Red</option>
+                                    <option value="sunshine-yellow">Sunshine Yellow</option>
+                                    <option value="moonless-night">Moonless Night</option>
+                                    <option value="spring-blossom">Spring Blossom</option>
+                                    <option value="autumn-foliage">Autumn Foliage</option>
+                                    <option value="winter-wonderland">Winter Wonderland</option>
+                                    <option value="galactic-core">Galactic Core</option>
+                                    <option value="lava-flow">Lava Flow</option>
+                                    <option value="rainbow-spectrum">Rainbow Spectrum</option>
+                                    <option value="carbon-fiber">Carbon Fiber</option>
+                                    <option value="wood-grain">Wood Grain</option>
+                                    <option value="marble">Marble</option>
+                                    <option value="hexagon">Hexagon</option>
+                                    <option value="concrete">Concrete</option>
+                                    <option value="fabric">Fabric</option>
+                                    <option value="diamond">Diamond</option>
+                                    <option value="checkerboard">Checkerboard</option>
+                                    <option value="waves">Waves</option>
+                                    <option value="grid">Grid</option>
+                                    <option value="paper">Paper</option>
+                                    <option value="leather">Leather</option>
+                                    <option value="metal">Metal</option>
+                                    <option value="rust">Rust</option>
+                                    <option value="sand">Sand</option>
+                                    <option value="stone">Stone</option>
+                                    <option value="water">Water</option>
+                                    <option value="wood-light">Wood Light</option>
+                                    <option value="wood-dark">Wood Dark</option>
+                                    <option value="space-station">Space Station</option>
+                                    <option value="jungle-vines">Jungle Vines</option>
+                                    <option value="underwater">Underwater</option>
+                                    <option value="volcanic-rock">Volcanic Rock</option>
+                                    <option value="starry-night">Starry Night</option>
+                                    <option value="circuit-board">Circuit Board</option>
+                                    <option value="glacier">Glacier</option>
+                                    <option value="cracked-earth">Cracked Earth</option>
+                                    <option value="plaid">Plaid</option>
+                                    <option value="polka-dot">Polka Dot</option>
+                                    <option value="stripes">Stripes</option>
+                                    <option value="crosshatch">Crosshatch</option>
+                                    <option value="zigzag">Zigzag</option>
+                                    <option value="diagonal-lines">Diagonal Lines</option>
+                                    <option value="bricks">Bricks</option>
+                                    <option value="honeycomb">Honeycomb</option>
+                                    <option value="tile">Tile</option>
+                                    <option value="lined-paper">Lined Paper</option>
+                                    <option value="graph-paper">Graph Paper</option>
+                                    <option value="music-notes">Music Notes</option>
+                                    <option value="hearts">Hearts</option>
+                                    <option value="stars">Stars</option>
+                                    <option value="clouds">Clouds</option>
+                                    <option value="leaves">Leaves</option>
+                                    <option value="flowers">Flowers</option>
+                                    <option value="bubbles">Bubbles</option>
+                                    <option value="dots">Dots</option>
+                                    <option value="maze">Maze</option>
+                                    <option value="triangles">Triangles</option>
+                                    <option value="pyramids">Pyramids</option>
+                                    <option value="squares">Squares</option>
+                                    <option value="waffle">Waffle</option>
+                                    <option value="waves-diagonal">Waves Diagonal</option>
+                                    <option value="grid-large">Grid Large</option>
+                                    <option value="grid-small">Grid Small</option>
+                                    <option value="noise">Noise</option>
+                                    <option value="static">Static</option>
+                                    <option value="glow">Glow</option>
+                                    <option value="neon-pulse">Neon Pulse</option>
+                                    <option value="vintage-map">Vintage Map</option>
+                                    <option value="retro-grid">Retro Grid</option>
+                                    <option value="abstract-art">Abstract Art</option>
+                                    <option value="cosmic-rays">Cosmic Rays</option>
+                                    <option value="digital-glitch">Digital Glitch</option>
+                                    <option value="holographic">Holographic</option>
+                                    <option value="matrix-code">Matrix Code</option>
+                                    <option value="prism-light">Prism Light</option>
+                                    <option value="aurora-borealis">Aurora Borealis</option>
+                                    <option value="fire-and-ice">Fire and Ice</option>
+                                    <option value="lava-lamp">Lava Lamp</option>
+                                    <option value="rainbow-swirl">Rainbow Swirl</option>
+                                    <option value="electric-storm">Electric Storm</option>
+                                    <option value="nebula">Nebula</option>
+                                    <option value="forest">Forest</option>
+                                    <option value="ocean">Ocean</option>
+                                    <option value="sunset">Sunset</option>
+                                    <option value="mountains">Mountains</option>
+                                    <option value="cityscape">Cityscape</option>
+                                    <option value="desert">Desert</option>
+                                    <option value="arctic">Arctic</option>
+                                    <option value="jungle">Jungle</option>
+                                    <option value="space">Space</option>
+                                    <option value="underwater-deep">Underwater Deep</option>
+                                    <option value="volcano">Volcano</option>
+                                    <option value="aurora-polar">Aurora Polar</option>
+                                    <option value="cosmic-web">Cosmic Web</option>
+                                    <option value="storm">Storm</option>
+                                    <option value="aurora-borealiss">Aurora Borealiss</option>
+                                    <option value="nebula-blue">Nebula Blue</option>
+                                    <option value="forest-deep">Forest Deep</option>
+                                    <option value="ocean-deep">Ocean Deep</option>
+                                    <option value="sunset-desert">Sunset Desert</option>
+                                    <option value="mountains-snow">Mountains Snow</option>
+                                    <option value="cityscape-night">Cityscape Night</option>
+                                    <option value="desert-sand">Desert Sand</option>
+                                    <option value="arctic-ice">Arctic Ice</option>
+                                    <option value="jungle-rain">Jungle Rain</option>
+                                    <option value="space-stars">Space Stars</option>
+                                    <option value="underwater-coral">Underwater Coral</option>
+                                    <option value="volcano-erupt">Volcano Erupt</option>
+                                    <option value="aurora-northern">Aurora Northern</option>
+                                    <option value="cosmic-nebula">Cosmic Nebula</option>
+                                    <option value="storm-clouds">Storm Clouds</option>
+                                    <option value="aurora-borealisss">Aurora Borealisss</option>
+                                    <option value="nebula-purple">Nebula Purple</option>
+                                    <option value="forest-pine">Forest Pine</option>
+                                    <option value="ocean-waves">Ocean Waves</option>
+                                    <option value="sunset-horizon">Sunset Horizon</option>
+                                    <option value="mountains-peaks">Mountains Peaks</option>
+                                    <option value="cityscape-lights">Cityscape Lights</option>
+                                    <option value="desert-dunes">Desert Dunes</option>
+                                    <option value="arctic-tundra">Arctic Tundra</option>
+                                    <option value="jungle-vine">Jungle Vine</option>
+                                    <option value="space-galaxy">Space Galaxy</option>
+                                    <option value="underwater-tide">Underwater Tide</option>
+                                    <option value="volcano-magma">Volcano Magma</option>
+                                    <option value="aurora-lights">Aurora Lights</option>
+                                    <option value="cosmic-dust">Cosmic Dust</option>
+                                    <option value="storm-front">Storm Front</option>
+                                    <option value="aurora-borealiss">Aurora Borealiss</option>
+                                    <option value="nebula-red">Nebula Red</option>
+                                    <option value="forest-oak">Forest Oak</option>
+                                    <option value="ocean-depths">Ocean Depths</option>
+                                    <option value="sunset-valley">Sunset Valley</option>
+                                    <option value="mountains-everest">Mountains Everest</option>
+                                    <option value="cityscape-skyline">Cityscape Skyline</option>
+                                    <option value="desert-mirage">Desert Mirage</option>
+                                    <option value="arctic-north">Arctic North</option>
+                                    <option value="jungle-animals">Jungle Animals</option>
+                                    <option value="space-rocket">Space Rocket</option>
+                                    <option value="underwater-ship">Underwater Ship</option>
+                                    <option value="volcano-fire">Volcano Fire</option>
+                                    <option value="aurora-sky">Aurora Sky</option>
+                                    <option value="cosmic-star">Cosmic Star</option>
+                                    <option value="storm-wind">Storm Wind</option>
+                                    <option value="aurora-borealissss">Aurora Borealissss</option>
+                                    <option value="nebula-green">Nebula Green</option>
+                                    <option value="forest-palm">Forest Palm</option>
+                                    <option value="ocean-reef">Ocean Reef</option>
+                                    <option value="sunset-beach">Sunset Beach</option>
+                                    <option value="mountains-ski">Mountains Ski</option>
+                                    <option value="cityscape-downtown">Cityscape Downtown</option>
+                                    <option value="desert-road">Desert Road</option>
+                                    <option value="arctic-northpole">Arctic Northpole</option>
+                                    <option value="jungle-tree">Jungle Tree</option>
+                                    <option value="space-planet">Space Planet</option>
+                                    <option value="underwater-mermaid">Underwater Mermaid</option>
+                                    <option value="volcano-ash">Volcano Ash</option>
+                                    <option value="aurora-ice">Aurora Ice</option>
+                                    <option value="cosmic-void">Cosmic Void</option>
+                                    <option value="storm-lightning">Storm Lightning</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- GAME OVERLAY -->
+    <div id="game-overlay">
+        <iframe id="game-iframe" frameborder="0"></iframe>
+    </div>
+
+    <script>
+        (function() {
+            // --- Configuration ---
+            const ZONES_URL = "https://cdn.jsdelivr.net/gh/Notrexed/assets@latest/allzone.json";
+            const COVER_URL = "https://cdn.jsdelivr.net/gh/Notrexed/covers@main";
+            const HTML_URL = "https://cdn.jsdelivr.net/gh/Notrexed/html@latest";
+
+            // --- DOM Elements ---
+            const gameListEl = document.getElementById("game-list");
+            const searchInput = document.getElementById("game-search");
+            const overlayId = "game-overlay";
+            const iframeId = "game-iframe";
+            const themeSelect = document.getElementById("theme-select");
+
+            // --- State ---
+            let zones = [];
+            let filtered = [];
+
+            // --- Helper Functions ---
+            function buildCoverUrl(zone) {
+                if (!zone || !zone.id) return null;
+                return `${COVER_URL}/${zone.id}.jpg`;
+            }
+
+            function buildZoneHtmlUrl(zone) {
+                if (!zone || !zone.url) return null; // Prefer the 'url' field if available
+                if (!zone.id) return null;
+                return `${HTML_URL}/${zone.id}.html`;
+            }
+
+            // --- Theme Handling ---
+            const THEME_KEY = "robbsite-theme";
+            const storedTheme = localStorage.getItem(THEME_KEY);
+
+            if (storedTheme) {
+                applyTheme(storedTheme);
+                themeSelect.value = storedTheme;
+            } else {
+                applyTheme('default'); // Apply default if no stored theme
+            }
+
+            themeSelect.addEventListener('change', (e) => {
+                const selectedTheme = e.target.value;
+                applyTheme(selectedTheme);
+                localStorage.setItem(THEME_KEY, selectedTheme);
+            });
+
+            function applyTheme(themeName) {
+                document.body.setAttribute('data-theme', themeName);
+            }
+
+            // --- Game Rendering ---
+            function renderList(list) {
+                if (!gameListEl) return;
+                gameListEl.innerHTML = "";
+
+                if (!list || list.length === 0) {
+                    gameListEl.innerHTML = "<div style='color: var(--text-muted); font-size: 14px; text-align: center; padding: 2rem;'>No games found.</div>";
+                    return;
+                }
+
+                list.forEach(zone => {
+                    const name = (zone && zone.name ? zone.name : "").toLowerCase();
+                    // Filter out specific games if needed (e.g., OvO)
+                    // if (name.includes("ovo")) return;
+
+                    const card = document.createElement("div");
+                    card.className = "game-card";
+                    card.dataset.title = (zone.name || "").toLowerCase();
+
+                    const topRow = document.createElement("div");
+                    topRow.className = "game-top-row";
+
+                    const icon = document.createElement("div");
+                    icon.className = "game-icon";
+                    const coverUrl = buildCoverUrl(zone);
+                    if (coverUrl) {
+                        icon.style.backgroundImage = `url(${coverUrl})`;
+                    } else {
+                        icon.textContent = "🎮"; // Default icon
+                    }
+
+                    const body = document.createElement("div");
+                    body.className = "game-body";
+
+                    const title = document.createElement("div");
+                    title.className = "game-title";
+                    title.textContent = zone.name || "Untitled Game";
+
+                    const desc = document.createElement("div");
+                    desc.className = "game-desc";
+                    if (zone.author) {
+                        desc.textContent = zone.author;
+                    } else if (zone.id !== undefined && zone.id !== null) {
+                        desc.textContent = "ID " + zone.id;
+                    } else {
+                        desc.textContent = "Click to play";
+                    }
+
+                    body.appendChild(title);
+                    body.appendChild(desc);
+
+                    topRow.appendChild(icon);
+                    topRow.appendChild(body);
+
+                    const actions = document.createElement("div");
+                    actions.className = "game-actions";
+
+                    const btn = document.createElement("button");
+                    btn.className = "game-button";
+                    btn.textContent = "Play";
+                    btn.addEventListener("click", (e) => {
+                        e.stopPropagation();
+                        openOverlay(zone);
+                    });
+
+                    actions.appendChild(btn);
+                    card.appendChild(topRow);
+                    card.appendChild(actions);
+
+                    card.addEventListener("click", () => openOverlay(zone));
+
+                    gameListEl.appendChild(card);
+                });
+            }
+
+            function applyFilter(query) {
+                const q = (query || "").trim().toLowerCase();
+                const base = zones; // Assuming no special filtering like soundboard here initially
+                filtered = !q ? base : base.filter((z) => (z.name || "").toLowerCase().includes(q));
+                renderList(filtered);
+            }
+
+            async function initGames() {
+                if (!gameListEl) return;
+                try {
+                    const res = await fetch(ZONES_URL + "?t=" + Date.now());
+                    const data = await res.json();
+                    zones = Array.isArray(data) ? data : [];
+                    filtered = zones;
+                    renderList(filtered);
+                } catch (e) {
+                    console.error("Failed to load games", e);
+                    gameListEl.innerHTML = "<div style='color: var(--text-muted); font-size: 14px; text-align: center; padding: 2rem;'>Failed to load games.</div>";
+                }
+
+                if (searchInput) {
+                    searchInput.addEventListener("input", (e) => {
+                        applyFilter(e.target.value || "");
+                    });
+                }
+            }
+
+            // --- Overlay Handling ---
+            function openOverlay(zone) {
+                const overlay = document.getElementById(overlayId);
+                const iframe = document.getElementById(iframeId);
+                if (!overlay || !iframe || !zone) return;
+
+                overlay.style.display = "flex";
+                document.body.style.overflow = "hidden";
+                const url = buildZoneHtmlUrl(zone);
+                if (!url) {
+                     console.error("Could not construct game URL for zone:", zone);
+                     alert("Sorry, this game cannot be loaded right now.");
+                     closeOverlay(); // Close overlay if URL is invalid
+                     return;
+                }
+
+                // Attempt to load the game HTML into the iframe
+                fetch(url + "?t=" + Date.now())
+                    .then(res => res.text())
+                    .then(html => {
+                        const doc = iframe.contentWindow.document;
+                        doc.open();
+                        doc.write(html);
+                        doc.close();
+                    })
+                    .catch(err => {
+                        console.error("Failed to load game into iframe", err);
+                        const doc = iframe.contentWindow.document;
+                        doc.open();
+                        doc.write(`<body style='margin:0;display:flex;align-items:center;justify-content:center;background:var(--bg-soft);color:var(--text-main);font-family:sans-serif;'><div>Failed to load game. Error: ${err.message}</div></body>`);
+                        doc.close();
+                    });
+            }
+
+            function closeOverlay() {
+                const overlay = document.getElementById(overlayId);
+                const iframe = document.getElementById(iframeId);
+                if (overlay) overlay.style.display = "none";
+                if (iframe && iframe.contentWindow) {
+                    try {
+                        const doc = iframe.contentWindow.document;
+                        doc.open();
+                        doc.write("<!doctype html><title></title>");
+                        doc.close();
+                    } catch (e) {
+                        console.warn("Could not clear iframe document on close:", e);
+                    }
+                }
+                document.body.style.overflow = "";
+            }
+
+            // Close overlay when clicking on the background
+            document.getElementById(overlayId).addEventListener('click', closeOverlay);
+
+            // --- Tab Switching (Basic Implementation) ---
+            const sideNavItems = document.querySelectorAll('.side-nav-item');
+            const tabPanels = document.querySelectorAll('.tab-panel');
+
+            sideNavItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    const targetTab = item.getAttribute('data-tab');
+
+                    // Update active nav item
+                    sideNavItems.forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+
+                    // Show target panel, hide others
+                    tabPanels.forEach(panel => {
+                        if (panel.getAttribute('data-tab-panel') === targetTab) {
+                            panel.classList.add('active');
+                        } else {
+                            panel.classList.remove('active');
+                        }
+                    });
+                });
+            });
+
+
+            // --- Initialize ---
+            if (document.readyState === "loading") {
+                document.addEventListener("DOMContentLoaded", initGames);
+            } else {
+                initGames();
+            }
+
+        })();
+    </script>
+</body>
+</html>
